@@ -1,0 +1,33 @@
+{
+  "manifest_version": 2,
+  "name": "Service Worker Detector",
+  "description": "This Chrome extension detects if a website registers a Service Worker.",
+  "author": "Thomas Steiner (tomac@google.com, @tomayac)",
+  "version": "1.0.0",
+  "icons": {
+    "16": "icon-female.png",
+    "48": "icon-female.png",
+    "128": "icon-female.png"
+  },
+  "page_action": {
+    "default_icon": "icon.png",
+    "default_popup": "popup.html",
+    "default_title": "❌👷‍♀️👷‍ No active Service Worker found."
+  },
+  "permissions": [
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["contentscript.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "background": {
+      "scripts": ["background.js"],
+      "persistent": false
+  },
+   "minimum_chrome_version": "40"
+}
