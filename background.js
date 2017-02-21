@@ -15,11 +15,10 @@
  */
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log(request)
   if (request) {
     chrome.pageAction.setIcon({
       tabId: sender.tab.id,
-      path: `icon-${['male', 'female'][Math.round(Math.random())]}.png`
+      path: `assets/icon-${['male', 'female'][Math.round(Math.random())]}.png`
     });
     chrome.pageAction.setTitle({
       tabId: sender.tab.id,
@@ -29,7 +28,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   } else {
     chrome.pageAction.setIcon({
       tabId: sender.tab.id,
-      path: `icon.png`
+      path: `assets/icon.png`
     });
     chrome.pageAction.setTitle({
       tabId: sender.tab.id,

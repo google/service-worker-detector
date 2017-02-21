@@ -2,22 +2,14 @@
   <head>
     <meta charset="utf-8">
     <title>Service Worker Detector</title>
-    <style>
-      body {
-        font-size: 16px;
-        font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
-      }
-      thead {
-        background-color: #eee;
-      }
-      td, th {
-        padding: .5rem;
-        white-space: nowrap;
-      }
-    </style>
+    <link rel="stylesheet" href="vendor/prism.css">
+    <link rel="stylesheet" href="main.css">
   </head>
   <body>
-    <div id="result"></div>
+    <div id="container"></div>
+    <script src="vendor/esprima.js"></script>
+    <script src="vendor/prism.js"></script>
+    <script src="vendor/beautify.min.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>

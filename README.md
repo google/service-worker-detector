@@ -7,7 +7,7 @@ by reading the ```navigator.serviceWorker.controller```
 [property](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerContainer/controller).
 
 ## 🖥 🔫 Screenshot
-![Screenshot](https://github.com/tomayac/service-worker-detector/blob/master/screenshot.png)
+![Screenshot](https://github.com/tomayac/service-worker-detector/assets/blob/master/screenshot.png)
 
 ## ⚤ 👍 Diversity in Tech
 The extension represents Service Workers with

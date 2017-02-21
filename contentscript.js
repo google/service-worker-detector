@@ -15,18 +15,33 @@
  */
 
 (() => {
-  let controller = null;
-
-  if ('serviceWorker' in navigator) {
-    const serviceWorkerController = navigator.serviceWorker.controller;
-    if (serviceWorkerController) {
-      controller = {
-        state: serviceWorkerController.state,
-        src: serviceWorkerController.scriptURL,
-      };
-      chrome.runtime.sendMessage(null, controller);
-    }
+  if (!('serviceWorker' in navigator)) {
+    return
   }
+  let controller = null;
+  const serviceWorkerController = navigator.serviceWorker.controller;
+  if (!serviceWorkerController && !serviceWorkerController.scriptURL) {
+    return;
+  }
+  controller = {
+    state: serviceWorkerController.state,
+    scriptUrl: serviceWorkerController.scriptURL,
+    source: ''
+  };
+  fetch(controller.scriptUrl)
+  .then(response => {
+    if (!response.ok) {
+      throw Error('Network response was not OK.');
+    }
+    return response.text();
+  })
+  .then(script => {
+    controller.source = script;
+    chrome.runtime.sendMessage(null, controller);
+  })
+  .catch(fetchError => {
+    console.log(fetchError);
+  });
 
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'getServiceWorker') {
