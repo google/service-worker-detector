@@ -9,6 +9,10 @@ by reading the ```navigator.serviceWorker.controller```
 ## 🖥 🔫 Screenshot
 ![Screenshot](https://github.com/tomayac/service-worker-detector/blob/master/assets/screenshot.png)
 
+## 🔧 🛍 Installation
+Install the Service Worker Detector extension via the
+[Chrome Web Store](https://chrome.google.com/webstore/detail/service-worker-detector/ofdigdofloanabjcaijfidkogmejlmjc).
+
 ## ⚤ 👍 Diversity in Tech
 The extension represents Service Workers with
 [construction worker emoji](http://emojipedia.org/search/?q=construction+worker).
