@@ -22,7 +22,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     });
     chrome.pageAction.setTitle({
       tabId: sender.tab.id,
-      title: `✅👷‍♀️ Active Service Worker found at ${request.src}.`
+      title: `✅👷‍♀️ Active Service Worker found at ${request.scriptUrl}.`
     });
     chrome.pageAction.show(sender.tab.id);
   } else {

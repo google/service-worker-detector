@@ -3,7 +3,7 @@
   "name": "Service Worker Detector",
   "description": "This Chrome extension detects if a website registers a Service Worker.",
   "author": "Thomas Steiner (tomac@google.com, @tomayac)",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "icons": {
     "16": "assets/icon-female.png",
     "48": "assets/icon-female.png",
