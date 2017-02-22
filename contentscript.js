@@ -20,7 +20,7 @@
   }
   let controller = null;
   const serviceWorkerController = navigator.serviceWorker.controller;
-  if (!serviceWorkerController && !serviceWorkerController.scriptURL) {
+  if (!serviceWorkerController || !serviceWorkerController.scriptURL) {
     return;
   }
   controller = {
