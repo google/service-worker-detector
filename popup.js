@@ -112,10 +112,11 @@ chrome.tabs.query({active: true, currentWindow: true}, tabs => {
       } else {
         return;
       }
-      const tokenStrings = code.querySelectorAll(
-            'span[class="token string"], span[class="token string highlight"]');
+      const tokenStrings = code.querySelectorAll('span.token.string',
+          'span.token.string.highlight');
       tokenStrings.forEach(tokenString => {
-        if (tokenString.textContent !== `'${input.id}'`) {
+        if ((tokenString.textContent !== `'${input.id}'`) &&
+            (tokenString.textContent !== `"${input.id}"`)) {
           return;
         }
         if (input.checked) {
