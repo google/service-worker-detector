@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request, sender) => {
   if (request) {
     chrome.pageAction.setIcon({
       tabId: sender.tab.id,

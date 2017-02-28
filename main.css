@@ -7,21 +7,19 @@ body {
   font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
   height: 600px;
   margin: 0;
-  overflow: hidden;
+  overflow-y: scroll;
+  overflow-x: hidden;
   padding: 0;
   width: 700px;
 }
 
 #container {
-  height: 100%;
   padding: .25rem;
-  width: 100%;
 }
 
 table {
   border: solid 2px #eee;
   display: table;
-  height: 100%;
   margin-bottom: .25rem;
   width: 100%;
 }
@@ -47,13 +45,19 @@ li {
 }
 
 pre {
-  height: 400px;
   font-size: 12px;
-  overflow-y: scroll;
 }
 
 code {
   white-space: pre-wrap !important;
+}
+
+details {
+  margin-bottom: 1rem;
+}
+
+summary {
+  outline: none;
 }
 
 .highlight {

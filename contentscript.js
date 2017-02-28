@@ -26,7 +26,9 @@
   controller = {
     state: serviceWorkerController.state,
     scriptUrl: serviceWorkerController.scriptURL,
-    source: ''
+    source: '',
+    manifest: '',
+    manifestUrl: ''
   };
   fetch(controller.scriptUrl)
   .then(response => {
@@ -37,7 +39,30 @@
   })
   .then(script => {
     controller.source = script;
-    chrome.runtime.sendMessage(null, controller);
+    return document.querySelector('link[rel="manifest"]');
+
+  })
+  .then(link => {
+    if (link && link.href) {
+      controller.manifestUrl = link.href;
+      return fetch(link.href);
+    }
+    return false;
+  })
+  .then(response => {
+    if (!response) {
+      return false;
+    }
+    if (!response.ok) {
+      throw Error('Network response was not OK.');
+    }
+    return response.json();
+  })
+  .then(manifest => {
+    if (manifest) {
+      controller.manifest = manifest;
+    }
+    return chrome.runtime.sendMessage(null, controller);
   })
   .catch(fetchError => {
     console.log(fetchError);
