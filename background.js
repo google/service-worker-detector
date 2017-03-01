@@ -18,21 +18,21 @@ chrome.runtime.onMessage.addListener((request, sender) => {
   if (request) {
     chrome.pageAction.setIcon({
       tabId: sender.tab.id,
-      path: `assets/icon-${['male', 'female'][Math.round(Math.random())]}.png`
+      path: `assets/icon-${['male', 'female'][Math.round(Math.random())]}.png`,
     });
     chrome.pageAction.setTitle({
       tabId: sender.tab.id,
-      title: `✅👷‍♀️ Active Service Worker found at ${request.scriptUrl}.`
+      title: `✅👷‍♀️ Active Service Worker found at ${request.scriptUrl}.`,
     });
     chrome.pageAction.show(sender.tab.id);
   } else {
     chrome.pageAction.setIcon({
       tabId: sender.tab.id,
-      path: `assets/icon.png`
+      path: `assets/icon.png`,
     });
     chrome.pageAction.setTitle({
       tabId: sender.tab.id,
-      title: '❌👷‍♀️ No active Service Worker found.'
+      title: '❌👷‍♀️ No active Service Worker found.',
     });
     chrome.pageAction.hide(sender.tab.id);
   }

@@ -16,7 +16,7 @@
 
 (() => {
   if (!('serviceWorker' in navigator)) {
-    return
+    return;
   }
   let controller = null;
   const serviceWorkerController = navigator.serviceWorker.controller;
@@ -28,28 +28,27 @@
     scriptUrl: serviceWorkerController.scriptURL,
     source: '',
     manifest: '',
-    manifestUrl: ''
+    manifestUrl: '',
   };
   fetch(controller.scriptUrl)
-  .then(response => {
+  .then((response) => {
     if (!response.ok) {
       throw Error('Network response was not OK.');
     }
     return response.text();
   })
-  .then(script => {
+  .then((script) => {
     controller.source = script;
     return document.querySelector('link[rel="manifest"]');
-
   })
-  .then(link => {
+  .then((link) => {
     if (link && link.href) {
       controller.manifestUrl = link.href;
       return fetch(link.href);
     }
     return false;
   })
-  .then(response => {
+  .then((response) => {
     if (!response) {
       return false;
     }
@@ -58,13 +57,13 @@
     }
     return response.json();
   })
-  .then(manifest => {
+  .then((manifest) => {
     if (manifest) {
       controller.manifest = manifest;
     }
     return chrome.runtime.sendMessage(null, controller);
   })
-  .catch(fetchError => {
+  .catch((fetchError) => {
     console.log(fetchError);
   });
 

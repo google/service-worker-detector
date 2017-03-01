@@ -16,12 +16,12 @@
 
 const container = document.querySelector('#container');
 
-const beautify = source => {
+const beautify = (source) => {
   const beautified = js_beautify(source, {
     indent_size: 2,
     no_preserve_newlines: true,
     wrap_line_length: 80,
-    end_with_newline: true
+    end_with_newline: true,
   });
   return Prism.highlight(beautified, Prism.languages.javascript);
 };
@@ -33,7 +33,7 @@ const parseManifest = (manifest, origin) => {
       members: [
         {key: 'name', name: 'Name'},
         {key: 'short_name', name: 'Short Name'},
-      ]
+      ],
     },
     {
       name: 'Presentation',
@@ -45,40 +45,40 @@ const parseManifest = (manifest, origin) => {
         {key: 'display', name: 'Display'},
         {key: 'lang', name: 'Language'},
         {key: 'dir', name: 'Direction'},
-      ]
+      ],
     },
     {
       name: 'Icons',
       members: [
         {key: 'icons', name: 'Icons'},
-      ]
+      ],
     },
     {
       name: 'Others',
       members: [
         {
           key: 'prefer_related_applications',
-          name: 'Prefer Related Applications'
+          name: 'Prefer Related Applications',
         },
         {key: 'related_applications', name: 'Related Applications'},
         {key: 'gcm_sender_id', name: 'GCM Sender ID'},
-      ]
-    }
+      ],
+    },
   ];
   let manifestHtml = [];
 
   // Helper function to get absolute URLs
-  const absoluteUrl = url => {
+  const absoluteUrl = (url) => {
     try {
       url = new URL(url);
     } catch (e) {
       url = new URL(origin + (/^\//.test(url) ? url.substring(1) : url));
     }
     return url.toString();
-  }
+  };
 
   // Helper function to get SVG
-  const getRect = fill => {
+  const getRect = (fill) => {
     return `
         <svg width="15" height="15" viewBox="0 0 15 15"
             xmlns="http://www.w3.org/2000/svg">
@@ -87,12 +87,12 @@ const parseManifest = (manifest, origin) => {
         </svg>`;
   };
 
-  clusters.forEach(cluster => {
+  clusters.forEach((cluster) => {
     manifestHtml.push(`
         <tr>
           <th colspan="2">${cluster.name}</th>
         </tr>`);
-    cluster.members.forEach(key => {
+    cluster.members.forEach((key) => {
       const keyName = key.name;
       const keyId = key.key;
       if (/_color$/.test(keyId)) {
@@ -109,7 +109,7 @@ const parseManifest = (manifest, origin) => {
           return parseInt(a.sizes.split(' ')[0].split('x')[0], 10) -
               parseInt(b.sizes.split(' ')[0].split('x')[0], 10);
         })
-        .forEach(icon => {
+        .forEach((icon) => {
           const src = absoluteUrl(icon.src);
           const firstSize = icon.sizes.split(' ')[0].split('x');
           const width = firstSize[0];
@@ -137,7 +137,7 @@ const parseManifest = (manifest, origin) => {
             </tr>`);
       } else if (/^related_applications/.test(keyId) && manifest[keyId] &&
           Array.isArray(manifest[keyId])) {
-        manifest[keyId].forEach(relatedApplication => {
+        manifest[keyId].forEach((relatedApplication) => {
           const url = absoluteUrl(relatedApplication.url);
           const platform = relatedApplication.platform;
           const id = relatedApplication.id || '';
@@ -185,7 +185,7 @@ const getServiceWorkerHtml = (state, relativeUrl, result) => {
               </td>
               <td>
                 <ul id="events">
-                  ${result.events.sort().map(event => {
+                  ${result.events.sort().map((event) => {
                     return `
                         <li>
                           <input id="${event}" name="${event}" type="checkbox">
@@ -237,9 +237,10 @@ const getManifestHtml = (result, origin) => {
       </details>`;
 };
 
-chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
   const currentTab = tabs[0];
-  chrome.tabs.sendMessage(currentTab.id, {type: 'getServiceWorker'}, result => {
+  chrome.tabs.sendMessage(currentTab.id, {type: 'getServiceWorker'},
+      (result) => {
     if (!result.scriptUrl || !result.state) {
       return;
     }
@@ -248,7 +249,7 @@ chrome.tabs.query({active: true, currentWindow: true}, tabs => {
     const state = result.state.charAt(0).toUpperCase() + result.state.slice(1);
     result.events = {};
     try {
-      esprima.parse(result.source, {}, node => {
+      esprima.parse(result.source, {}, (node) => {
         if ((node.type === 'CallExpression') &&
             (node.callee.type === 'MemberExpression') &&
             (node.callee.property.name === 'addEventListener') &&
@@ -272,7 +273,7 @@ chrome.tabs.query({active: true, currentWindow: true}, tabs => {
 
     const events = document.querySelector('#events');
     const code = document.querySelector('#code');
-    events.addEventListener('click', clickEvent => {
+    events.addEventListener('click', (clickEvent) => {
       const target = clickEvent.target;
       let input;
       if (target.nodeName === 'LABEL') {
@@ -284,7 +285,7 @@ chrome.tabs.query({active: true, currentWindow: true}, tabs => {
       }
       const tokenStrings = code.querySelectorAll('span.token.string',
           'span.token.string.highlight');
-      tokenStrings.forEach(tokenString => {
+      tokenStrings.forEach((tokenString) => {
         if ((tokenString.textContent !== `'${input.id}'`) &&
             (tokenString.textContent !== `"${input.id}"`)) {
           return;

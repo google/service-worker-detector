@@ -1,0 +1,38 @@
+{
+  "name": "service-worker-detector",
+  "version": "2.1.1",
+  "description": "This Chrome extension detects if a website registers a Service Worker.",
+  "main": "background.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint . --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomayac/service-worker-detector.git"
+  },
+  "author": "Thomas Steiner <steiner.thomas@gmail.com> (http://blog.tomayac.com/)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/tomayac/service-worker-detector/issues"
+  },
+  "homepage": "https://github.com/tomayac/service-worker-detector#readme",
+  "devDependencies": {
+    "eslint": "^3.16.1",
+    "eslint-config-google": "^0.7.1"
+  },
+  "eslintConfig": {
+    "parserOptions": {
+      "ecmaVersion": 7
+    },
+    "extends": [
+      "google"
+    ],
+    "env": {
+      "es6": true,
+      "browser": true,
+      "serviceworker": true,
+      "node": true
+    }
+  }
+}
