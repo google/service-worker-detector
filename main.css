@@ -5,16 +5,16 @@
 body {
   font-size: 16px;
   font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
-  height: 600px;
   margin: 0;
-  overflow-y: scroll;
-  overflow-x: hidden;
   padding: 0;
   width: 700px;
 }
 
 #container {
+  height: 600px;
   padding: .25rem;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 table {
@@ -57,7 +57,9 @@ details {
 }
 
 summary {
+  background-color: #87cefa;
   outline: none;
+  padding: .25rem;
 }
 
 .highlight {

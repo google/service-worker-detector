@@ -93,7 +93,7 @@ const parseManifest = (manifest, origin) => {
         <svg width="15" height="15" viewBox="0 0 15 15"
             xmlns="http://www.w3.org/2000/svg">
           <rect x="0" y="0" width="15" height="15" rx="3" ry="3"
-            fill="${fill}" />
+            fill="${fill}" stroke="#ddd" />
         </svg>`;
   };
 
