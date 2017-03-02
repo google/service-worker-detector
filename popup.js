@@ -108,7 +108,7 @@ const parseManifest = (manifest, origin) => {
     cluster.members.forEach((key) => {
       const keyName = key.name;
       const keyId = key.key;
-      if (/_color$/.test(keyId)) {
+      if (/_color$/.test(keyId) && manifest[keyId]) {
         manifestHtml.push(`
             <tr>
               <td>${keyName}</td>
@@ -138,7 +138,8 @@ const parseManifest = (manifest, origin) => {
                 </td>
               </tr>`);
         });
-      } else if (/^scope$/.test(keyId) || /^start_url$/.test(keyId)) {
+      } else if ((/^scope$/.test(keyId) || /^start_url$/.test(keyId)) &&
+                 (manifest[keyId])) {
         manifest[keyId] = absoluteUrl(manifest[keyId]);
         manifestHtml.push(`
             <tr>
