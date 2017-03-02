@@ -26,7 +26,7 @@ const beautify = (source) => {
   return Prism.highlight(beautified, Prism.languages.javascript);
 };
 
-const parseManifest = (manifest, origin) => {
+const parseManifest = (manifest, baseUrl) => {
   const clusters = [
     {
       name: 'Identity',
@@ -75,14 +75,15 @@ const parseManifest = (manifest, origin) => {
   ];
 
   // Helper function to get absolute URLs
-  const absoluteUrl = (url) => {
-    if (!url) {
+  const absoluteUrl = (urlString) => {
+    if (!urlString) {
       return false;
     }
+    let url;
     try {
-      url = new URL(url);
+      url = new URL(urlString, baseUrl);
     } catch (e) {
-      url = new URL(origin + (/^\//.test(url) ? url.substring(1) : url));
+      return false;
     }
     return url.toString();
   };
@@ -256,7 +257,7 @@ const getServiceWorkerHtml = (state, relativeUrl, result) => {
       </details>`;
 };
 
-const getManifestHtml = (result, origin) => {
+const getManifestHtml = (result, baseUrl) => {
   return `
       <details>
         <summary>📃 Manifest</summary>
@@ -274,7 +275,7 @@ const getManifestHtml = (result, origin) => {
                         result.manifestUrl.substr(0, 50) + '…' :
                         result.manifestUrl}</a></td>
             </tr>
-            ${parseManifest(result.manifest, origin)}
+            ${parseManifest(result.manifest, baseUrl)}
           </tbody>
         </table>
       </details>`;
@@ -310,7 +311,9 @@ chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
     result.events = Object.keys(result.events);
     let html = getServiceWorkerHtml(state, relativeUrl, result);
     if (result.manifest) {
-      html += getManifestHtml(result, `${new URL(currentTab.url).origin}/`);
+      const baseUrl = result.manifestUrl.substring(0,
+          result.manifestUrl.lastIndexOf('/') + 1);
+      html += getManifestHtml(result, baseUrl);
     }
     container.innerHTML = html;
 

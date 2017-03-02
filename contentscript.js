@@ -43,7 +43,6 @@
   })
   .then((link) => {
     if (link && link.href) {
-      controller.manifestUrl = link.href;
       return fetch(link.href);
     }
     return false;
@@ -55,6 +54,7 @@
     if (!response.ok) {
       throw Error('Network response was not OK.');
     }
+    controller.manifestUrl = response.url;
     return response.json();
   })
   .then((manifest) => {
