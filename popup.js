@@ -33,12 +33,14 @@ const parseManifest = (manifest, origin) => {
       members: [
         {key: 'name', name: 'Name'},
         {key: 'short_name', name: 'Short Name'},
+        {key: 'description', name: 'Description'},
       ],
     },
     {
       name: 'Presentation',
       members: [
         {key: 'start_url', name: 'Start URL'},
+        {key: 'scope', name: 'Scope'},
         {key: 'theme_color', name: 'Theme Color'},
         {key: 'background_color', name: 'Background Color'},
         {key: 'orientation', name: 'Orientation'},
@@ -54,6 +56,12 @@ const parseManifest = (manifest, origin) => {
       ],
     },
     {
+      name: 'Screenshots',
+      members: [
+        {key: 'screenshots', name: 'Screenshots'},
+      ],
+    },
+    {
       name: 'Others',
       members: [
         {
@@ -65,10 +73,12 @@ const parseManifest = (manifest, origin) => {
       ],
     },
   ];
-  let manifestHtml = [];
 
   // Helper function to get absolute URLs
   const absoluteUrl = (url) => {
+    if (!url) {
+      return false;
+    }
     try {
       url = new URL(url);
     } catch (e) {
@@ -87,11 +97,14 @@ const parseManifest = (manifest, origin) => {
         </svg>`;
   };
 
+  let lastSize;
+  let manifestHtml = [];
   clusters.forEach((cluster) => {
     manifestHtml.push(`
         <tr>
           <th colspan="2">${cluster.name}</th>
         </tr>`);
+    lastSize = manifestHtml.length;
     cluster.members.forEach((key) => {
       const keyName = key.name;
       const keyId = key.key;
@@ -101,8 +114,8 @@ const parseManifest = (manifest, origin) => {
               <td>${keyName}</td>
               <td>${getRect(manifest[keyId])} ${manifest[keyId]}</td>
             </tr>`);
-      } else if (/^icons$/.test(keyId) && manifest[keyId] &&
-          Array.isArray(manifest[keyId])) {
+      } else if ((/^icons$/.test(keyId) || /^screenshots/.test(keyId)) &&
+                 (manifest[keyId] && Array.isArray(manifest[keyId]))) {
         // Sort icons by increasing size
         manifest[keyId]
         .sort((a, b) => {
@@ -114,12 +127,14 @@ const parseManifest = (manifest, origin) => {
           const firstSize = icon.sizes.split(' ')[0].split('x');
           const width = firstSize[0];
           const height = firstSize[1];
+          const type = icon.type || '';
           manifestHtml.push(`
               <tr>
                 <td>${width}x${height}</td>
                 <td>
                   <img style="width:${width}px;height:${height}px;"
-                      src="${src}" title="${width}x${height}">
+                      src="${src}" title="${
+                          type ? type + ' ' : ''}${width}x${height}">
                 </td>
               </tr>`);
         });
@@ -135,26 +150,47 @@ const parseManifest = (manifest, origin) => {
                         manifest[keyId]}</a>
               </td>
             </tr>`);
-      } else if (/^related_applications/.test(keyId) && manifest[keyId] &&
-          Array.isArray(manifest[keyId])) {
-        manifest[keyId].forEach((relatedApplication) => {
-          const url = absoluteUrl(relatedApplication.url);
-          const platform = relatedApplication.platform;
-          const id = relatedApplication.id || '';
-          manifestHtml.push(`
-              <tr>
-                <td>${platform}</td>
-                <td><a href="${url}" title="${id}">${platform}</a></td>
-              </tr>`);
-        });
-      } else if (manifest[keyId] !== undefined) {
+      } else if ((/^prefer_related_applications$/.test(keyId)) &&
+                 (typeof manifest[keyId] === 'boolean')) {
         manifestHtml.push(`
             <tr>
               <td>${keyName}</td>
-              <td>${manifest[keyId]}</td>
+              <td>${manifest[keyId] === true ? 'true' : 'false'}</td>
             </tr>`);
+      } else if (/^related_applications$/.test(keyId) && manifest[keyId] &&
+          Array.isArray(manifest[keyId])) {
+        manifest[keyId].forEach((relatedApplication) => {
+          const platform = relatedApplication.platform;
+          if (!platform) {
+            return;
+          }
+          const url = absoluteUrl(relatedApplication.url);
+          const id = relatedApplication.id || '';
+          if (!url && !id) {
+            return;
+          }
+          if (url) {
+            manifestHtml.push(`
+                <tr>
+                  <td>${platform}</td>
+                  <td><a href="${url}" title="${id}">${url.length > 50 ?
+                      url.substr(0, 50) + '…' :
+                      url}</a></td>
+                </tr>`);
+          } else {
+            manifestHtml.push(`
+                <tr>
+                  <td>${platform}</td>
+                  <td>${id}</a></td>
+                </tr>`);
+          }
+        });
       }
     });
+    // If the current cluster has no members, remove its header
+    if (lastSize === manifestHtml.length) {
+      manifestHtml.pop();
+    }
   });
   return manifestHtml.join('\n');
 };
@@ -267,7 +303,7 @@ chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
     result.events = Object.keys(result.events);
     let html = getServiceWorkerHtml(state, relativeUrl, result);
     if (result.manifest) {
-      html += getManifestHtml(result, currentTab.url);
+      html += getManifestHtml(result, `${new URL(currentTab.url).origin}/`);
     }
     container.innerHTML = html;
 

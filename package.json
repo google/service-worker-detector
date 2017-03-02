@@ -1,6 +1,6 @@
 {
   "name": "service-worker-detector",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "This Chrome extension detects if a website registers a Service Worker.",
   "main": "background.js",
   "scripts": {
