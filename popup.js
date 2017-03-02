@@ -186,6 +186,12 @@ const parseManifest = (manifest, origin) => {
                 </tr>`);
           }
         });
+      } else if (manifest[keyId] !== undefined) {
+        manifestHtml.push(`
+            <tr>
+              <td>${keyName}</td>
+              <td>${manifest[keyId]}</td>
+            </tr>`);
       }
     });
     // If the current cluster has no members, remove its header
