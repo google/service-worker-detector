@@ -62,14 +62,20 @@ const parseManifest = (manifest, baseUrl) => {
       ],
     },
     {
-      name: 'Others',
+      name: 'Related Applications',
       members: [
         {
           key: 'prefer_related_applications',
           name: 'Prefer Related Applications',
         },
         {key: 'related_applications', name: 'Related Applications'},
+      ],
+    },
+    {
+      name: 'Google Cloud Messaging (GCM)',
+      members: [
         {key: 'gcm_sender_id', name: 'GCM Sender ID'},
+        {key: 'gcm_user_visible_only', name: 'GCM User Visible Only'},
       ],
     },
   ];
