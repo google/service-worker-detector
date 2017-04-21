@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+window.browser = window.browser || window.chrome;
+
 (() => {
   if (!('serviceWorker' in navigator)) {
     return;
@@ -61,13 +63,20 @@
     if (manifest) {
       controller.manifest = manifest;
     }
-    return chrome.runtime.sendMessage(null, controller);
+    try {
+      // ⚠️ TODO: Why does Firefox require ```option.toProxyScript```?
+      return browser.runtime.sendMessage(null, controller, {
+        toProxyScript: false,
+      });
+    } catch (e) {
+      return browser.runtime.sendMessage(null, controller);
+    }
   })
   .catch((fetchError) => {
     console.log(fetchError);
   });
 
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'getServiceWorker') {
       sendResponse(controller);
     }

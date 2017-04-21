@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+window.browser = window.browser || window.chrome;
+
 const container = document.querySelector('#container');
 
 const beautify = (source) => {
@@ -287,9 +289,9 @@ const getManifestHtml = (result, baseUrl) => {
       </details>`;
 };
 
-chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
   const currentTab = tabs[0];
-  chrome.tabs.sendMessage(currentTab.id, {type: 'getServiceWorker'},
+  browser.tabs.sendMessage(currentTab.id, {type: 'getServiceWorker'},
       (result) => {
     if (!result.scriptUrl || !result.state) {
       return;
