@@ -302,6 +302,7 @@ browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
     result.events = {};
     try {
       esprima.parse(result.source, {}, (node) => {
+        // Find addEventlistener('$event') style events
         if ((node.type === 'CallExpression') &&
             (node.callee.type === 'MemberExpression') &&
             (node.callee.property.name === 'addEventListener') &&
@@ -310,6 +311,15 @@ browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
             (node.arguments.length) &&
             (node.arguments[0].type === 'Literal')) {
           result.events[node.arguments[0].value] = true;
+        // Find on$Event style events
+        } else if ((node.type === 'ExpressionStatement') &&
+                   (node.expression.type === 'AssignmentExpression') &&
+                   (node.expression.left.type === 'MemberExpression') &&
+                   (node.expression.left.object.name === 'self') &&
+                   (node.expression.left.property.type === 'Identifier') &&
+                   (/^on/.test(node.expression.left.property.name))) {
+          const event = node.expression.left.property.name.replace(/^on/, '');
+          result.events[event] = true;
         }
       });
     } catch (parseError) {
@@ -337,6 +347,8 @@ browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
       } else {
         return;
       }
+
+      // Find addEventlistener('$event') style events
       const tokenStrings = code.querySelectorAll('span.token.string',
           'span.token.string.highlight');
       tokenStrings.forEach((tokenString) => {
@@ -351,6 +363,26 @@ browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
           tokenString.classList.remove('highlight');
         }
       });
+
+      // Find on$Event style events
+      let walker =
+          document.createTreeWalker(code, NodeFilter.SHOW_TEXT, null, false);
+      let node;
+      while(node = walker.nextNode()) {
+        if (new RegExp(`on${input.id}`).test(node.textContent.trim())) {
+          const previousSibling = node.previousSibling;
+          const nextSibling = node.nextSibling;
+          if (input.checked) {
+            previousSibling.classList.add('highlight');
+            nextSibling.classList.add('highlight');
+            previousSibling.scrollIntoViewIfNeeded();
+          } else {
+            previousSibling.classList.remove('highlight');
+            nextSibling.classList.remove('highlight');
+          }
+          return;
+        }
+      }
     });
   });
 });
