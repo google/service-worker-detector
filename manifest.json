@@ -4,7 +4,7 @@
   "short_name": "SW Detector",
   "description": "This Chrome extension detects if a website registers a Service Worker.",
   "author": "Thomas Steiner (tomac@google.com, @tomayac)",
-  "version": "2.1.9",
+  "version": "2.2.0",
   "icons": {
     "16": "assets/icon-female.png",
     "48": "assets/icon-female.png",
@@ -13,7 +13,7 @@
   "page_action": {
     "default_icon": "assets/icon.png",
     "default_popup": "popup.html",
-    "default_title": "❌👷‍♀️👷‍ No active Service Worker found."
+    "default_title": "❌👷‍ No active Service Worker found."
   },
   "permissions": [
     "activeTab"

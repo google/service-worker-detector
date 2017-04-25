@@ -65,3 +65,12 @@ summary {
 .highlight {
   background-color: yellow !important;
 }
+
+.imported-script {
+  background-color: #F5F5F5;
+  display: inline-block;
+  margin: 0;
+  outline: none;
+  padding: 0;
+  vertical-align: top;
+}

@@ -212,6 +212,26 @@ const parseManifest = (manifest, baseUrl) => {
 };
 
 const getServiceWorkerHtml = (state, relativeUrl, result) => {
+  let beautifiedCode = beautify(result.source);
+  for (importedScriptUrl in result.importedScripts) {
+    if (!Object.prototype.hasOwnProperty.call(result.importedScripts,
+        importedScriptUrl)) {
+      continue;
+    }
+    // From https://github.com/benjamingr/RegExp.escape/blob/master/polyfill.js
+    const regExpUrl = importedScriptUrl.replace(/[\\^$*+?.()|[\]{}]/g, '\\$&');
+    const regExp = new RegExp(`(["'])${regExpUrl}["']`, 'g');
+    const code = beautify(result.importedScripts[importedScriptUrl]);
+    beautifiedCode = beautifiedCode.replace(regExp, `
+        <details class="imported-script">
+          <summary class="imported-script">
+            <a href="${importedScriptUrl}">$1${importedScriptUrl}$1</a>
+          </summary>
+          <div>$code</div>
+        </details>`
+        .replace(/\n\s*/g, '')
+        .replace('$code', code));
+  }
   return `
       <details open>
         <summary>👷 Service Worker</summary>
@@ -257,7 +277,7 @@ const getServiceWorkerHtml = (state, relativeUrl, result) => {
             <tr>
               <td colspan="3">
                 <pre><code id="code" class="language-javascript>${
-                    beautify(result.source)}</code></pre>
+                    beautifiedCode}</code></pre>
               </td>
             </tr>
           </tbody>
@@ -301,88 +321,125 @@ browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
     const state = result.state.charAt(0).toUpperCase() + result.state.slice(1);
     result.events = {};
     try {
+      // Find importScripts statements
+      let importedScriptsPromises = [];
+      let importedScriptsUrls = [];
       esprima.parse(result.source, {}, (node) => {
-        // Find addEventlistener('$event') style events
         if ((node.type === 'CallExpression') &&
-            (node.callee.type === 'MemberExpression') &&
-            (node.callee.property.name === 'addEventListener') &&
+            (node.callee.type === 'Identifier') &&
+            (node.callee.name === 'importScripts') &&
             (node.arguments) &&
-            (Array.isArray(node.arguments)) &&
-            (node.arguments.length) &&
-            (node.arguments[0].type === 'Literal')) {
-          result.events[node.arguments[0].value] = true;
-        // Find on$Event style events
-        } else if ((node.type === 'ExpressionStatement') &&
-                   (node.expression.type === 'AssignmentExpression') &&
-                   (node.expression.left.type === 'MemberExpression') &&
-                   (node.expression.left.object.name === 'self') &&
-                   (node.expression.left.property.type === 'Identifier') &&
-                   (/^on/.test(node.expression.left.property.name))) {
-          const event = node.expression.left.property.name.replace(/^on/, '');
-          result.events[event] = true;
+            (Array.isArray(node.arguments))) {
+          importedScriptsPromises = importedScriptsPromises.concat(
+              node.arguments.map((arg) => {
+            importedScriptsUrls.push(arg.value);
+            return fetch(new URL(arg.value, result.scriptUrl))
+            .then((response) => {
+              if (response.ok) {
+                return response.text();
+              }
+              throw Error(`Couldn't load ${arg.value}`);
+            })
+            .catch((e) => e);
+          }));
         }
+      });
+      Promise.all(importedScriptsPromises)
+      .then((importedScriptsSources) => {
+        let importedScripts = {};
+        importedScriptsSources.map((script, i) => {
+          importedScripts[importedScriptsUrls[i]] = importedScriptsSources[i];
+        });
+        result.importedScripts = importedScripts;
+        return result;
+      })
+      .then(() => {
+        // Some events may be hidden in imported scripts, so analyze them, too
+        const jointSources = Object.keys(result.importedScripts).map((url) => {
+          return result.importedScripts[url];
+        }).join('\n') + result.source;
+        esprima.parse(jointSources, {}, (node) => {
+          // Find addEventlistener('$event') style events
+          if ((node.type === 'CallExpression') &&
+              (node.callee.type === 'MemberExpression') &&
+              (node.callee.property.name === 'addEventListener') &&
+              (node.arguments) &&
+              (Array.isArray(node.arguments)) &&
+              (node.arguments.length) &&
+              (node.arguments[0].type === 'Literal')) {
+            result.events[node.arguments[0].value] = true;
+          // Find on$Event style events
+          } else if ((node.type === 'ExpressionStatement') &&
+                     (node.expression.type === 'AssignmentExpression') &&
+                     (node.expression.left.type === 'MemberExpression') &&
+                     (node.expression.left.object.name === 'self') &&
+                     (node.expression.left.property.type === 'Identifier') &&
+                     (/^on/.test(node.expression.left.property.name))) {
+            const event = node.expression.left.property.name.replace(/^on/, '');
+            result.events[event] = true;
+          }
+        });
+        result.events = Object.keys(result.events);
+        let html = getServiceWorkerHtml(state, relativeUrl, result);
+        if (result.manifest) {
+          const baseUrl = result.manifestUrl.substring(0,
+              result.manifestUrl.lastIndexOf('/') + 1);
+          html += getManifestHtml(result, baseUrl);
+        }
+        container.innerHTML = html;
+        const events = document.querySelector('#events');
+        const code = document.querySelector('#code');
+        events.addEventListener('click', (clickEvent) => {
+          const target = clickEvent.target;
+          let input;
+          if (target.nodeName === 'LABEL') {
+            input = events.querySelector(`#${target.getAttribute('for')}`);
+          } else if (target.nodeName === 'INPUT') {
+            input = target;
+          } else {
+            return;
+          }
+
+          // Find addEventlistener('$event') style events
+          const tokenStrings = code.querySelectorAll('span.token.string',
+              'span.token.string.highlight');
+          tokenStrings.forEach((tokenString) => {
+            if ((tokenString.textContent !== `'${input.id}'`) &&
+                (tokenString.textContent !== `"${input.id}"`)) {
+              return;
+            }
+            if (input.checked) {
+              tokenString.classList.add('highlight');
+              tokenString.scrollIntoViewIfNeeded();
+            } else {
+              tokenString.classList.remove('highlight');
+            }
+          });
+
+          // Find on$Event style events
+          let walker = document.createTreeWalker(code, NodeFilter.SHOW_TEXT,
+              null, false);
+          let node;
+          while(node = walker.nextNode()) {
+            if (new RegExp(`on${input.id}`).test(node.textContent.trim())) {
+              const previousSibling = node.previousSibling;
+              const nextSibling = node.nextSibling;
+              if (input.checked) {
+                previousSibling.classList.add('highlight');
+                nextSibling.classList.add('highlight');
+                previousSibling.scrollIntoViewIfNeeded();
+              } else {
+                previousSibling.classList.remove('highlight');
+                nextSibling.classList.remove('highlight');
+              }
+              return;
+            }
+          }
+        });
       });
     } catch (parseError) {
       console.log(parseError);
       result.source = JSON.stringify(parseError, null, 2);
     }
-    result.events = Object.keys(result.events);
-    let html = getServiceWorkerHtml(state, relativeUrl, result);
-    if (result.manifest) {
-      const baseUrl = result.manifestUrl.substring(0,
-          result.manifestUrl.lastIndexOf('/') + 1);
-      html += getManifestHtml(result, baseUrl);
-    }
-    container.innerHTML = html;
-
-    const events = document.querySelector('#events');
-    const code = document.querySelector('#code');
-    events.addEventListener('click', (clickEvent) => {
-      const target = clickEvent.target;
-      let input;
-      if (target.nodeName === 'LABEL') {
-        input = events.querySelector(`#${target.getAttribute('for')}`);
-      } else if (target.nodeName === 'INPUT') {
-        input = target;
-      } else {
-        return;
-      }
-
-      // Find addEventlistener('$event') style events
-      const tokenStrings = code.querySelectorAll('span.token.string',
-          'span.token.string.highlight');
-      tokenStrings.forEach((tokenString) => {
-        if ((tokenString.textContent !== `'${input.id}'`) &&
-            (tokenString.textContent !== `"${input.id}"`)) {
-          return;
-        }
-        if (input.checked) {
-          tokenString.classList.add('highlight');
-          tokenString.scrollIntoViewIfNeeded();
-        } else {
-          tokenString.classList.remove('highlight');
-        }
-      });
-
-      // Find on$Event style events
-      let walker =
-          document.createTreeWalker(code, NodeFilter.SHOW_TEXT, null, false);
-      let node;
-      while(node = walker.nextNode()) {
-        if (new RegExp(`on${input.id}`).test(node.textContent.trim())) {
-          const previousSibling = node.previousSibling;
-          const nextSibling = node.nextSibling;
-          if (input.checked) {
-            previousSibling.classList.add('highlight');
-            nextSibling.classList.add('highlight');
-            previousSibling.scrollIntoViewIfNeeded();
-          } else {
-            previousSibling.classList.remove('highlight');
-            nextSibling.classList.remove('highlight');
-          }
-          return;
-        }
-      }
-    });
   });
 });
