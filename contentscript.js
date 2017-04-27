@@ -32,7 +32,15 @@ window.browser = window.browser || window.chrome;
     manifest: '',
     manifestUrl: '',
   };
-  fetch(controller.scriptUrl)
+  const fetchOptions = {
+    credentials: 'include',
+    headers: {},
+  };
+  // 🤔 Facebook rely on a magic header, else they return HTML instead of JS
+  if (document.location.host === 'www.facebook.com') {
+    fetchOptions.headers['service-worker'] = 'script';
+  }
+  fetch(controller.scriptUrl, fetchOptions)
   .then((response) => {
     if (!response.ok) {
       throw Error('Network response was not OK.');

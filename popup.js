@@ -16,8 +16,6 @@
 
 window.browser = window.browser || window.chrome;
 
-const container = document.querySelector('#container');
-
 const beautify = (source) => {
   const beautified = js_beautify(source, {
     indent_size: 2,
@@ -219,18 +217,15 @@ const getServiceWorkerHtml = (state, relativeUrl, result) => {
       continue;
     }
     // From https://github.com/benjamingr/RegExp.escape/blob/master/polyfill.js
-    const regExpUrl = importedScriptUrl.replace(/[\\^$*+?.()|[\]{}]/g, '\\$&');
+    let regExpUrl = importedScriptUrl.replace(/[\\^$*+?.()|[\]{}]/g, '\\$&');
+    // Deal with potentially escaped forward slashes
+    regExpUrl = regExpUrl.replace(/\//g, '\\\\?/');
     const regExp = new RegExp(`(["'])${regExpUrl}["']`, 'g');
     const code = beautify(result.importedScripts[importedScriptUrl]);
-    beautifiedCode = beautifiedCode.replace(regExp, `
-        <details class="imported-script">
-          <summary class="imported-script">
-            <a href="${importedScriptUrl}">$1${importedScriptUrl}$1</a>
-          </summary>
-          <div>$code</div>
-        </details>`
-        .replace(/\n\s*/g, '')
-        .replace('$code', code));
+    beautifiedCode = beautifiedCode.replace(regExp,
+        /* eslint-disable max-len */
+        `<details class="imported-script"><summary class="imported-script"><a href="${importedScriptUrl}">$1${importedScriptUrl}$1</a></summary><div>${code}</div></details>`);
+        /* eslint-enable max-len */
   }
   return `
       <details open>
@@ -309,6 +304,67 @@ const getManifestHtml = (result, baseUrl) => {
       </details>`;
 };
 
+const renderHtml = (state, relativeUrl, result) => {
+  result.events = Object.keys(result.events);
+  let html = getServiceWorkerHtml(state, relativeUrl, result);
+  if (result.manifest) {
+    const baseUrl = result.manifestUrl.substring(0,
+        result.manifestUrl.lastIndexOf('/') + 1);
+    html += getManifestHtml(result, baseUrl);
+  }
+  const container = document.querySelector('#container');
+  container.innerHTML = html;
+  const events = document.querySelector('#events');
+  const code = document.querySelector('#code');
+  events.addEventListener('click', (clickEvent) => {
+    const target = clickEvent.target;
+    let input;
+    if (target.nodeName === 'LABEL') {
+      input = events.querySelector(`#${target.getAttribute('for')}`);
+    } else if (target.nodeName === 'INPUT') {
+      input = target;
+    } else {
+      return;
+    }
+
+    // Find addEventlistener('$event') style events
+    const tokenStrings = code.querySelectorAll('span.token.string',
+        'span.token.string.highlight');
+    tokenStrings.forEach((tokenString) => {
+      if ((tokenString.textContent !== `'${input.id}'`) &&
+          (tokenString.textContent !== `"${input.id}"`)) {
+        return;
+      }
+      if (input.checked) {
+        tokenString.classList.add('highlight');
+        tokenString.scrollIntoViewIfNeeded();
+      } else {
+        tokenString.classList.remove('highlight');
+      }
+    });
+
+    // Find on$Event style events
+    let walker = document.createTreeWalker(code, NodeFilter.SHOW_TEXT,
+        null, false);
+    let node;
+    while(node = walker.nextNode()) {
+      if (new RegExp(`on${input.id}`).test(node.textContent.trim())) {
+        const previousSibling = node.previousSibling;
+        const nextSibling = node.nextSibling;
+        if (input.checked) {
+          previousSibling.classList.add('highlight');
+          nextSibling.classList.add('highlight');
+          previousSibling.scrollIntoViewIfNeeded();
+        } else {
+          previousSibling.classList.remove('highlight');
+          nextSibling.classList.remove('highlight');
+        }
+        return;
+      }
+    }
+  });
+};
+
 browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
   const currentTab = tabs[0];
   browser.tabs.sendMessage(currentTab.id, {type: 'getServiceWorker'},
@@ -332,8 +388,9 @@ browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
             (Array.isArray(node.arguments))) {
           importedScriptsPromises = importedScriptsPromises.concat(
               node.arguments.map((arg) => {
-            importedScriptsUrls.push(arg.value);
-            return fetch(new URL(arg.value, result.scriptUrl))
+            const importedScriptsUrl = arg.value.replace(/\\\//g, '/');
+            importedScriptsUrls.push(importedScriptsUrl);
+            return fetch(new URL(importedScriptsUrl, result.scriptUrl))
             .then((response) => {
               if (response.ok) {
                 return response.text();
@@ -379,67 +436,11 @@ browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
             result.events[event] = true;
           }
         });
-        result.events = Object.keys(result.events);
-        let html = getServiceWorkerHtml(state, relativeUrl, result);
-        if (result.manifest) {
-          const baseUrl = result.manifestUrl.substring(0,
-              result.manifestUrl.lastIndexOf('/') + 1);
-          html += getManifestHtml(result, baseUrl);
-        }
-        container.innerHTML = html;
-        const events = document.querySelector('#events');
-        const code = document.querySelector('#code');
-        events.addEventListener('click', (clickEvent) => {
-          const target = clickEvent.target;
-          let input;
-          if (target.nodeName === 'LABEL') {
-            input = events.querySelector(`#${target.getAttribute('for')}`);
-          } else if (target.nodeName === 'INPUT') {
-            input = target;
-          } else {
-            return;
-          }
-
-          // Find addEventlistener('$event') style events
-          const tokenStrings = code.querySelectorAll('span.token.string',
-              'span.token.string.highlight');
-          tokenStrings.forEach((tokenString) => {
-            if ((tokenString.textContent !== `'${input.id}'`) &&
-                (tokenString.textContent !== `"${input.id}"`)) {
-              return;
-            }
-            if (input.checked) {
-              tokenString.classList.add('highlight');
-              tokenString.scrollIntoViewIfNeeded();
-            } else {
-              tokenString.classList.remove('highlight');
-            }
-          });
-
-          // Find on$Event style events
-          let walker = document.createTreeWalker(code, NodeFilter.SHOW_TEXT,
-              null, false);
-          let node;
-          while(node = walker.nextNode()) {
-            if (new RegExp(`on${input.id}`).test(node.textContent.trim())) {
-              const previousSibling = node.previousSibling;
-              const nextSibling = node.nextSibling;
-              if (input.checked) {
-                previousSibling.classList.add('highlight');
-                nextSibling.classList.add('highlight');
-                previousSibling.scrollIntoViewIfNeeded();
-              } else {
-                previousSibling.classList.remove('highlight');
-                nextSibling.classList.remove('highlight');
-              }
-              return;
-            }
-          }
-        });
+        renderHtml(state, relativeUrl, result);
       });
     } catch (parseError) {
-      console.log(parseError);
       result.source = JSON.stringify(parseError, null, 2);
+      renderHtml(state, relativeUrl, result);
     }
   });
 });
