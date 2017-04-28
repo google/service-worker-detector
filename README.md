@@ -1,7 +1,7 @@
 # 👷‍♀️ 👷 Service Worker Detector
 
 ## 💻 💬 Description
-This Chrome extension detects if a website registers a
+This extension detects if a website registers a
 [Service Worker](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorker)
 by reading the ```navigator.serviceWorker.controller```
 [property](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerContainer/controller).

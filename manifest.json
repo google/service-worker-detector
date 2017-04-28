@@ -2,9 +2,9 @@
   "manifest_version": 2,
   "name": "Service Worker Detector",
   "short_name": "SW Detector",
-  "description": "This Chrome extension detects if a website registers a Service Worker.",
+  "description": "This extension detects if a website registers a Service Worker.",
   "author": "Thomas Steiner (tomac@google.com, @tomayac)",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "icons": {
     "16": "assets/icon-female.png",
     "48": "assets/icon-female.png",
