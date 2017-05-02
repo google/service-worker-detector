@@ -34,12 +34,12 @@ window.browser = window.browser || window.chrome;
   };
   const fetchOptions = {
     credentials: 'include',
-    headers: {},
+    headers: {
+      // Required according to the spec:
+      // https://w3c.github.io/ServiceWorker/#service-worker-script-request
+      'service-worker': 'script',
+    },
   };
-  // 🤔 Facebook rely on a magic header, else they return HTML instead of JS
-  if (document.location.host === 'www.facebook.com') {
-    fetchOptions.headers['service-worker'] = 'script';
-  }
   fetch(controller.scriptUrl, fetchOptions)
   .then((response) => {
     if (!response.ok) {
