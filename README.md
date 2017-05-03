@@ -6,6 +6,8 @@ This extension detects if a website registers a
 by reading the ```navigator.serviceWorker.controller```
 [property](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerContainer/controller).
 
+Note: this is not an official Google product.
+
 ## 🖥 🔫 Screenshots
 ![Screenshot Service Worker](https://github.com/tomayac/service-worker-detector/blob/master/assets/screenshot-serviceworker.png)
 
