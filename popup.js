@@ -388,6 +388,11 @@ browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
             (Array.isArray(node.arguments))) {
           importedScriptsPromises = importedScriptsPromises.concat(
               node.arguments.map((arg) => {
+            // This means ```importScripts(variable)``` rather than
+            //  ```importScripts('https://example.org/sw.js')```
+            if (arg.type !== 'Literal') {
+              return Promise.resolve('');
+            }
             const importedScriptsUrl = arg.value.replace(/\\\//g, '/');
             importedScriptsUrls.push(importedScriptsUrl);
             return fetch(new URL(importedScriptsUrl, result.scriptUrl))
