@@ -1,0 +1,7 @@
+- Esprima ([https://github.com/jquery/esprima](https://github.com/jquery/esprima))
+  - ```esprima.js```: [https://unpkg.com/esprima@~3.1/dist/esprima.js](https://unpkg.com/esprima@~3.1/dist/esprima.js)
+- Prism ([https://github.com/PrismJS/prism](https://github.com/PrismJS/prism))
+  - ```prism.js```: [http://prismjs.com/download.html?themes=prism&languages=clike+javascript](http://prismjs.com/download.html?themes=prism&languages=clike+javascript)
+  - ```prism.css```: [http://prismjs.com/download.html?themes=prism&languages=clike+javascript](http://prismjs.com/download.html?themes=prism&languages=clike+javascript)
+- JS Beautifier ([https://github.com/beautify-web/js-beautify](https://github.com/beautify-web/js-beautify))
+  - ```beautify.min.js```: [https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.6.12/beautify.min.js](https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.6.12/beautify.min.js)
