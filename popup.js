@@ -181,9 +181,11 @@ const parseManifest = (manifest, baseUrl) => {
             manifestHtml.push(`
                 <tr>
                   <td>${platform}</td>
-                  <td><a href="${url}" title="${id}">${url.length > 50 ?
-                      url.substr(0, 50) + '…' :
-                      url}</a></td>
+                  <td>
+                    <a href="${url}" title="${id}">${url.length > 50 ?
+                        url.substr(0, 50) + '…' :
+                        url}</a>
+                  </td>
                 </tr>`);
           } else {
             manifestHtml.push(`
@@ -271,7 +273,7 @@ const getServiceWorkerHtml = (state, relativeUrl, result) => {
             </tr>
             <tr>
               <td colspan="3">
-                <pre><code id="code" class="language-javascript>${
+                <pre><code id="code" class="language-javascript">${
                     beautifiedCode}</code></pre>
               </td>
             </tr>
@@ -296,7 +298,8 @@ const getManifestHtml = (result, baseUrl) => {
                 <a href="${result.manifestUrl}" title="${result.manifestUrl}">${
                     result.manifestUrl.length > 50 ?
                         result.manifestUrl.substr(0, 50) + '…' :
-                        result.manifestUrl}</a></td>
+                        result.manifestUrl}</a>
+              </td>
             </tr>
             ${parseManifest(result.manifest, baseUrl)}
           </tbody>
