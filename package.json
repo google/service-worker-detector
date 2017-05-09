@@ -1,6 +1,6 @@
 {
   "name": "service-worker-detector",
-  "version": "2.2.5",
+  "version": "2.3.0",
   "description": "This extension detects if a website registers a Service Worker.",
   "main": "background.js",
   "scripts": {

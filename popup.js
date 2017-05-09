@@ -307,6 +307,70 @@ const getManifestHtml = (result, baseUrl) => {
       </details>`;
 };
 
+const getCacheHtml = ((cacheContents) => {
+  let html = `
+      <details>
+        <summary>🛢 Cache Storage</summary>
+        <div>`;
+  const columnNames = [
+    'Content Type',
+    'method',
+    'url',
+    'mode',
+    'credentials',
+  ];
+  for (let cacheName in cacheContents) {
+    if (!cacheContents.hasOwnProperty(cacheName)) {
+      continue;
+    }
+    html += `
+        <details>
+          <summary class="cache-storage">Cache
+            "<code>${cacheName}</code>"
+          </summary>
+          <table>
+            <thead>
+              <tr>${
+                columnNames.map((columnName) => {
+                  return `
+                      <th>${columnName === 'url' ?
+                        columnName.toUpperCase() :
+                        (columnName.charAt(0).toUpperCase() +
+                        columnName.slice(1))}
+                      </th>`;
+                }).join('\n')}
+              </tr>
+            </thead>
+            <tbody>${
+              cacheContents[cacheName].map((cacheEntry) => {
+                return `
+                    <tr>${
+                      columnNames.map((columnName) => {
+                        if (columnName === 'url') {
+                          const url = cacheEntry[columnName];
+                          return `
+                              <td>
+                                <a href="${url}" title="${url}">${
+                                    url.length > 40 ?
+                                        url.substr(0, 40) + '…' : url}
+                                </a>
+                              </td>`;
+                        } else {
+                          return `<td>${cacheEntry[columnName]}</td>`;
+                        }
+                      }).join('\n')}
+                    </tr>`;
+              }).join('\n')}
+            </tbody>
+          </table>
+        </details>`;
+  }
+  html += `
+      </div>
+    </details>`;
+  return html;
+});
+
 const renderHtml = (state, relativeUrl, result) => {
   result.events = Object.keys(result.events);
   let html = getServiceWorkerHtml(state, relativeUrl, result);
@@ -314,6 +378,9 @@ const renderHtml = (state, relativeUrl, result) => {
     const baseUrl = result.manifestUrl.substring(0,
         result.manifestUrl.lastIndexOf('/') + 1);
     html += getManifestHtml(result, baseUrl);
+  }
+  if (result.cacheContents && Object.keys(result.cacheContents).length) {
+    html += getCacheHtml(result.cacheContents);
   }
   const container = document.querySelector('#container');
   container.innerHTML = html;

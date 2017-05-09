@@ -20,17 +20,17 @@ window.browser = window.browser || window.chrome;
   if (!('serviceWorker' in navigator)) {
     return;
   }
-  let controller = null;
   const serviceWorkerController = navigator.serviceWorker.controller;
   if (!serviceWorkerController || !serviceWorkerController.scriptURL) {
     return;
   }
-  controller = {
+  let result = {
     state: serviceWorkerController.state,
     scriptUrl: serviceWorkerController.scriptURL,
     source: '',
     manifest: '',
     manifestUrl: '',
+    cacheContents: {},
   };
   const fetchOptions = {
     credentials: 'include',
@@ -40,7 +40,7 @@ window.browser = window.browser || window.chrome;
       'service-worker': 'script',
     },
   };
-  fetch(controller.scriptUrl, fetchOptions)
+  fetch(result.scriptUrl, fetchOptions)
   .then((response) => {
     if (!response.ok) {
       throw Error('Network response was not OK.');
@@ -48,7 +48,7 @@ window.browser = window.browser || window.chrome;
     return response.text();
   })
   .then((script) => {
-    controller.source = script;
+    result.source = script;
     return document.querySelector('link[rel="manifest"]');
   })
   .then((link) => {
@@ -64,20 +64,64 @@ window.browser = window.browser || window.chrome;
     if (!response.ok) {
       throw Error('Network response was not OK.');
     }
-    controller.manifestUrl = response.url;
+    result.manifestUrl = response.url;
     return response.json();
   })
   .then((manifest) => {
     if (manifest) {
-      controller.manifest = manifest;
+      result.manifest = manifest;
     }
+    if ('caches' in window) {
+      return caches.keys();
+    }
+    return [];
+  })
+  .then((cacheNames) => {
+    let cachePromises = [];
+    let cacheContents = {};
+    cacheNames.forEach((cacheName) => {
+      cacheContents[cacheName] = [];
+      cachePromises.push(caches.open(cacheName).then((cache) => cache.keys()));
+    });
+    return Promise.all(cachePromises)
+    .then((cacheResults) => {
+      const requestProperties = [
+        'method',
+        'url',
+        'mode',
+        'credentials',
+      ];
+      let responsePromises = [];
+      cacheResults.forEach((cacheResult, i) => {
+        cacheResult.forEach((request) => {
+          responsePromises.push(caches.match(request)
+          .then((cacheResponse) => {
+            let serializedRequest = {};
+            requestProperties.forEach((requestProperty) => {
+              serializedRequest[requestProperty] = request[requestProperty];
+            });
+            let contentType = cacheResponse.headers.get('content-type');
+            serializedRequest['Content Type'] = contentType ?
+                contentType.split(';')[0] :
+                '';
+            cacheContents[cacheNames[i]].push(serializedRequest);
+            return true;
+          }));
+        });
+      });
+      return Promise.all(responsePromises)
+      .then(() => cacheContents);
+    });
+  })
+  .then((cacheContents) => {
+    result.cacheContents = cacheContents;
     try {
       // ⚠️ TODO: Why does Firefox require ```option.toProxyScript```?
-      return browser.runtime.sendMessage(null, controller, {
+      return browser.runtime.sendMessage(null, result, {
         toProxyScript: false,
       });
     } catch (e) {
-      return browser.runtime.sendMessage(null, controller);
+      return browser.runtime.sendMessage(null, result);
     }
   })
   .catch((fetchError) => {
@@ -86,7 +130,7 @@ window.browser = window.browser || window.chrome;
 
   browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'getServiceWorker') {
-      sendResponse(controller);
+      sendResponse(result);
     }
   });
 })();
