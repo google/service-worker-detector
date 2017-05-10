@@ -285,7 +285,7 @@ const getServiceWorkerHtml = (state, relativeUrl, result) => {
 const getManifestHtml = (result, baseUrl) => {
   return `
       <details>
-        <summary>📃 Manifest</summary>
+        <summary>📃 Web Manifest</summary>
         <table>
           <thead>
             <tr>
@@ -313,18 +313,22 @@ const getCacheHtml = ((cacheContents) => {
         <summary>🛢 Cache Storage</summary>
         <div>`;
   const columnNames = [
-    'Content Type',
+    'mime',
     'method',
     'url',
-    'mode',
-    'credentials',
+    'type',
   ];
+  let first = true;
   for (let cacheName in cacheContents) {
     if (!cacheContents.hasOwnProperty(cacheName)) {
       continue;
     }
+    // Empty cache
+    if (!cacheContents[cacheName].length) {
+      continue;
+    }
     html += `
-        <details>
+        <details${first ? ' open' : ''}>
           <summary class="cache-storage">Cache
             "<code>${cacheName}</code>"
           </summary>
@@ -333,7 +337,7 @@ const getCacheHtml = ((cacheContents) => {
               <tr>${
                 columnNames.map((columnName) => {
                   return `
-                      <th>${columnName === 'url' ?
+                      <th>${columnName === 'url' || columnName === 'mime' ?
                         columnName.toUpperCase() :
                         (columnName.charAt(0).toUpperCase() +
                         columnName.slice(1))}
@@ -342,21 +346,92 @@ const getCacheHtml = ((cacheContents) => {
               </tr>
             </thead>
             <tbody>${
-              cacheContents[cacheName].map((cacheEntry) => {
+              cacheContents[cacheName].sort((a, b) => {
+                if (a.mime < b.mime) {
+                  return -1;
+                }
+                if (a.mime > b.mime) {
+                  return 1;
+                }
+                return 0;
+              })
+              .map((cacheEntry) => {
+                const url = cacheEntry.url;
+                const contentType = cacheEntry.mime;
                 return `
-                    <tr>${
-                      columnNames.map((columnName) => {
+                    <tr>
+                      ${columnNames.map((columnName) => {
                         if (columnName === 'url') {
-                          const url = cacheEntry[columnName];
                           return `
                               <td>
                                 <a href="${url}" title="${url}">${
-                                    url.length > 40 ?
-                                        url.substr(0, 40) + '…' : url}
+                                    url.length > 50 ?
+                                        url.substr(0, 50) + '…' : url}
                                 </a>
                               </td>`;
+                        } else if (columnName === 'mime') {
+                          if (/^image\//.test(contentType)) {
+                            return `
+                                <td>
+                                  <a href="${url}" title="${url}">
+                                    <img class="preview" src="${url}"
+                                        title="${contentType}"
+                                        alt="${url}">
+                                  </a>
+                                </td>`;
+                          } else if (/^text\/css$/.test(contentType)) {
+                            return `
+                                <td>
+                                  <span title="${contentType}">🖌</span>
+                                </td>`;
+                          } else if (/^audio\//.test(contentType)) {
+                            return `
+                                <td>
+                                  <span title="${contentType}">🔈</span>
+                                </td>`;
+                          } else if (/^video\//.test(contentType)) {
+                            return `
+                                <td>
+                                  <span title="${contentType}">📹</span>
+                                </td>`;
+                          } else if (/\/.*?javascript/.test(contentType)) {
+                            return `
+                                <td>
+                                  <span title="${contentType}">📝</span>
+                                </td>`;
+                          } else if (/^text\/html/.test(contentType)) {
+                            return `
+                                <td>
+                                  <span title="${contentType}">📄</span>
+                                </td>`;
+                          } else if (/^application\/.*?font/
+                              .test(contentType)) {
+                            return `
+                                <td>
+                                  <span title="${contentType}">🔡</span>
+                                </td>`;
+                          } else if (/\/json/.test(contentType)) {
+                            return `
+                                <td>
+                                  <span title="${contentType}">🔖</span>
+                                </td>`;
+                          } else if (/application\/manifest\+json/
+                              .test(contentType)) {
+                            return `
+                                <td>
+                                  <span title="${contentType}">📃</span>
+                                </td>`;
+                          } else {
+                            return `
+                                <td>
+                                  <span title="unknown">❓</span>
+                                </td>`;
+                          }
                         } else {
-                          return `<td>${cacheEntry[columnName]}</td>`;
+                          return `
+                              <td>
+                                ${cacheEntry[columnName]}
+                              </td>`;
                         }
                       }).join('\n')}
                     </tr>`;
@@ -364,6 +439,7 @@ const getCacheHtml = ((cacheContents) => {
             </tbody>
           </table>
         </details>`;
+    first = false;
   }
   html += `
       </div>

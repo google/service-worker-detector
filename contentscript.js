@@ -88,8 +88,6 @@ window.browser = window.browser || window.chrome;
       const requestProperties = [
         'method',
         'url',
-        'mode',
-        'credentials',
       ];
       let responsePromises = [];
       cacheResults.forEach((cacheResult, i) => {
@@ -101,11 +99,11 @@ window.browser = window.browser || window.chrome;
               serializedRequest[requestProperty] = request[requestProperty];
             });
             let contentType = cacheResponse.headers.get('content-type');
-            serializedRequest['Content Type'] = contentType ?
+            serializedRequest.type = cacheResponse.type;
+            serializedRequest.mime = contentType ?
                 contentType.split(';')[0] :
-                '';
-            cacheContents[cacheNames[i]].push(serializedRequest);
-            return true;
+                'unknown';
+            return cacheContents[cacheNames[i]].push(serializedRequest);
           }));
         });
       });

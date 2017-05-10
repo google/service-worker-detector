@@ -10,13 +10,6 @@ body {
   width: 700px;
 }
 
-#container {
-  height: 600px;
-  padding: .25rem;
-  overflow-y: scroll;
-  overflow-x: hidden;
-}
-
 table {
   border: solid 2px #eee;
   display: table;
@@ -77,4 +70,17 @@ summary {
 
 .cache-storage {
   background-color: transparent;
+}
+
+.preview {
+  width: 1.5rem;
+  max-width: 1.5rem;
+  height: auto;
+}
+
+#container {
+  height: 600px;
+  padding: .25rem;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
