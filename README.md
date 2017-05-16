@@ -9,9 +9,9 @@ by reading the ```navigator.serviceWorker.controller```
 Note: this is not an official Google product.
 
 ## 🖥 🔫 Screenshots
-![Screenshot Service Worker](https://github.com/tomayac/service-worker-detector/blob/master/assets/screenshot-serviceworker.png)
+![Screenshot Service Worker](https://github.com/google/service-worker-detector/blob/master/assets/screenshot-serviceworker.png)
 
-![Screenshot Manifest](https://github.com/tomayac/service-worker-detector/blob/master/assets/screenshot-manifest.png)
+![Screenshot Manifest](https://github.com/google/service-worker-detector/blob/master/assets/screenshot-manifest.png)
 
 ## 🔧 🛍 Installation
 Install the Service Worker Detector extension via the
