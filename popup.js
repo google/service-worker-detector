@@ -140,8 +140,8 @@ const parseManifest = (manifest, baseUrl) => {
                 <td>${width}x${height}</td>
                 <td>
                   <img style="width:${width}px;height:${height}px;"
-                      src="${src}" title="${
-                          type ? type + ' ' : ''}${width}x${height}">
+                      src="${src}"
+                      title="${type ? type + ' ' : ''}${width}x${height}">
                 </td>
               </tr>`);
         });
@@ -152,10 +152,9 @@ const parseManifest = (manifest, baseUrl) => {
             <tr>
               <td>${keyName}</td>
               <td>
-                <a href="${manifest[keyId]}" title="${manifest[keyId]}">${
-                    manifest[keyId].length > 50 ?
-                        manifest[keyId].substr(0, 50) + '…' :
-                        manifest[keyId]}</a>
+                <a href="${manifest[keyId]}" title="${manifest[keyId]}">
+                  ${manifest[keyId]}
+                </a>
               </td>
             </tr>`);
       } else if ((/^prefer_related_applications$/.test(keyId)) &&
@@ -182,9 +181,7 @@ const parseManifest = (manifest, baseUrl) => {
                 <tr>
                   <td>${platform}</td>
                   <td>
-                    <a href="${url}" title="${id}">${url.length > 50 ?
-                        url.substr(0, 50) + '…' :
-                        url}</a>
+                    <a href="${url}" title="${id}">${url}</a>
                   </td>
                 </tr>`);
           } else {
@@ -199,7 +196,7 @@ const parseManifest = (manifest, baseUrl) => {
         manifestHtml.push(`
             <tr>
               <td>${keyName}</td>
-              <td>${manifest[keyId]}</td>
+              <td title="${manifest[keyId]}">${manifest[keyId]}</td>
             </tr>`);
       }
     });
@@ -211,7 +208,8 @@ const parseManifest = (manifest, baseUrl) => {
   return manifestHtml.join('\n');
 };
 
-const getServiceWorkerHtml = (state, relativeUrl, result) => {
+const getServiceWorkerHtml =
+    (state, relativeScopeUrl, relativeScriptUrl, result) => {
   let beautifiedCode = beautify(result.source);
   for (importedScriptUrl in result.importedScripts) {
     if (!Object.prototype.hasOwnProperty.call(result.importedScripts,
@@ -226,6 +224,7 @@ const getServiceWorkerHtml = (state, relativeUrl, result) => {
     const code = beautify(result.importedScripts[importedScriptUrl]);
     beautifiedCode = beautifiedCode.replace(regExp,
         /* eslint-disable max-len */
+        // Can't have new lines here as the syntax highlighter chokes on them
         `<details class="imported-script"><summary class="imported-script"><a href="${importedScriptUrl}">$1${importedScriptUrl}$1</a></summary><div>${code}</div></details>`);
         /* eslint-enable max-len */
   }
@@ -236,6 +235,7 @@ const getServiceWorkerHtml = (state, relativeUrl, result) => {
           <thead>
             <tr>
               <th>State</th>
+              <th>Scope</th>
               <th>Script URL</th>
               <th>Events</th>
             </tr>
@@ -247,10 +247,14 @@ const getServiceWorkerHtml = (state, relativeUrl, result) => {
                   `\u274C\u00A0\u00A0${state}`}
               </td>
               <td>
-                <a href="${result.scriptUrl}" title="${result.scriptUrl}">${
-                    relativeUrl.length > 50 ?
-                        relativeUrl.substr(0, 50) + '…' :
-                        relativeUrl}</a>
+                <a href="${result.scope}" title="${result.scope}">
+                  ${relativeScopeUrl}
+                </a>
+              </td>
+              <td>
+                <a href="${result.scriptUrl}" title="${result.scriptUrl}">
+                  ${relativeScriptUrl}
+                </a>
               </td>
               <td>
                 <ul id="events">
@@ -267,7 +271,7 @@ const getServiceWorkerHtml = (state, relativeUrl, result) => {
           </tbody>
           <tbody>
             <tr>
-              <th colspan="3">
+              <th colspan="4">
                 Service Worker Code <small>(beautified)</small>
               </th>
             </tr>
@@ -295,10 +299,9 @@ const getManifestHtml = (result, baseUrl) => {
           <tbody>
             <tr>
               <td colspan="2">
-                <a href="${result.manifestUrl}" title="${result.manifestUrl}">${
-                    result.manifestUrl.length > 50 ?
-                        result.manifestUrl.substr(0, 50) + '…' :
-                        result.manifestUrl}</a>
+                <a href="${result.manifestUrl}" title="${result.manifestUrl}">
+                  ${result.manifestUrl}
+                </a>
               </td>
             </tr>
             ${parseManifest(result.manifest, baseUrl)}
@@ -321,10 +324,6 @@ const getCacheHtml = ((cacheContents) => {
   let first = true;
   for (let cacheName in cacheContents) {
     if (!cacheContents.hasOwnProperty(cacheName)) {
-      continue;
-    }
-    // Empty cache
-    if (!cacheContents[cacheName].length) {
       continue;
     }
     html += `
@@ -364,10 +363,7 @@ const getCacheHtml = ((cacheContents) => {
                         if (columnName === 'url') {
                           return `
                               <td>
-                                <a href="${url}" title="${url}">${
-                                    url.length > 50 ?
-                                        url.substr(0, 50) + '…' : url}
-                                </a>
+                                <a href="${url}" title="${url}">${url}</a>
                               </td>`;
                         } else if (columnName === 'mime') {
                           if (/^image\//.test(contentType)) {
@@ -447,9 +443,9 @@ const getCacheHtml = ((cacheContents) => {
   return html;
 });
 
-const renderHtml = (state, relativeUrl, result) => {
+const renderHtml = (state, scope, relativeScriptUrl, result) => {
   result.events = Object.keys(result.events);
-  let html = getServiceWorkerHtml(state, relativeUrl, result);
+  let html = getServiceWorkerHtml(state, scope, relativeScriptUrl, result);
   if (result.manifest) {
     const baseUrl = result.manifestUrl.substring(0,
         result.manifestUrl.lastIndexOf('/') + 1);
@@ -518,8 +514,10 @@ browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
     if (!result.scriptUrl || !result.state) {
       return;
     }
-    const url = new URL(result.scriptUrl);
-    const relativeUrl = `${url.pathname}${url.search}`;
+    const scriptUrl = new URL(result.scriptUrl);
+    const relativeScriptUrl = `${scriptUrl.pathname}${scriptUrl.search}`;
+    const scopeUrl = new URL(result.scope);
+    const relativeScopeUrl = `${scopeUrl.pathname}${scopeUrl.search}`;
     const state = result.state.charAt(0).toUpperCase() + result.state.slice(1);
     result.events = {};
     try {
@@ -587,11 +585,11 @@ browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
             result.events[event] = true;
           }
         });
-        renderHtml(state, relativeUrl, result);
+        renderHtml(state, relativeScopeUrl, relativeScriptUrl, result);
       });
     } catch (parseError) {
       result.source = JSON.stringify(parseError, null, 2);
-      renderHtml(state, relativeUrl, result);
+      renderHtml(state, relativeScopeUrl, relativeScriptUrl, result);
     }
   });
 });

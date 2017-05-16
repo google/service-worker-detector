@@ -12,7 +12,7 @@ body {
 
 table {
   border: solid 2px #eee;
-  display: table;
+  table-layout: fixed;
   margin-bottom: .25rem;
   width: 100%;
 }
@@ -23,6 +23,8 @@ th {
 
 td, th {
   padding: .25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
   text-align: left;
   vertical-align: top;
   white-space: nowrap;
@@ -30,6 +32,7 @@ td, th {
 
 ul {
   list-style: none;
+  padding-left: 0;
 }
 
 li {
