@@ -22,7 +22,7 @@ window.browser = window.browser || window.chrome;
   }
 
   // Can't call ```navigator.serviceWorker.ready``` from a contentscript,
-  //  injecting it directly instead
+  // injecting it directly instead
   const getServiceWorkerRegistration = () => {
     return new Promise((resolve) => {
       const script = document.createElement('script');

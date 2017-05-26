@@ -273,11 +273,19 @@ const getServiceWorkerHtml =
             <tr>
               <th colspan="4">
                 Service Worker Code <small>(beautified)</small>
+                <span class="font-size">
+                  <label>
+                    <span class="smaller">🔠</span>
+                      <input type="range" min="50" max="100" step="5" value="75"
+                          id="font-size">
+                    <span class="bigger">🔠</span> Font Size
+                  </label>
+                </span>
               </th>
             </tr>
             <tr>
               <td colspan="3">
-                <pre><code id="code" class="language-javascript">${
+                <pre id="sw-code"><code class="language-javascript">${
                     beautifiedCode}</code></pre>
               </td>
             </tr>
@@ -456,8 +464,17 @@ const renderHtml = (state, scope, relativeScriptUrl, result) => {
   }
   const container = document.querySelector('#container');
   container.innerHTML = html;
+
+  // Allow changing the font size
+  const fontSize = document.querySelector('#font-size');
+  const pre = document.querySelector('#sw-code');
+  fontSize.addEventListener('input', (inputEvent) => {
+    pre.style.fontSize = `${parseInt(fontSize.value, 10) / 100}rem`;
+  });
+
+  // Highlight the Service Worker events in the code
   const events = document.querySelector('#events');
-  const code = document.querySelector('#code');
+  const code = pre.querySelector('code');
   events.addEventListener('click', (clickEvent) => {
     const target = clickEvent.target;
     let input;
@@ -468,7 +485,6 @@ const renderHtml = (state, scope, relativeScriptUrl, result) => {
     } else {
       return;
     }
-
     // Find addEventlistener('$event') style events
     const tokenStrings = code.querySelectorAll('span.token.string',
         'span.token.string.highlight');
@@ -484,7 +500,6 @@ const renderHtml = (state, scope, relativeScriptUrl, result) => {
         tokenString.classList.remove('highlight');
       }
     });
-
     // Find on$Event style events
     let walker = document.createTreeWalker(code, NodeFilter.SHOW_TEXT,
         null, false);

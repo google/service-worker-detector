@@ -1,11 +1,11 @@
 {
   "name": "service-worker-detector",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "description": "This extension detects if a website registers a Service Worker.",
   "main": "background.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint . --fix"
+    "lint": "eslint . --fix && stylelint \"**/*.css\""
   },
   "repository": {
     "type": "git",
@@ -19,7 +19,8 @@
   "homepage": "https://github.com/google/service-worker-detector#readme",
   "devDependencies": {
     "eslint": "^3.19.0",
-    "eslint-config-google": "^0.7.1"
+    "eslint-config-google": "^0.7.1",
+    "stylelint-csstree-validator": "^1.1.1"
   },
   "eslintConfig": {
     "parserOptions": {
@@ -33,6 +34,14 @@
       "browser": true,
       "serviceworker": true,
       "node": true
+    }
+  },
+  "stylelint": {
+    "plugins": [
+      "stylelint-csstree-validator"
+    ],
+    "rules": {
+      "csstree/validator": true
     }
   }
 }

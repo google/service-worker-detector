@@ -24,6 +24,7 @@ th {
 td, th {
   padding: .25rem;
   overflow: hidden;
+  position: relative;
   text-overflow: ellipsis;
   text-align: left;
   vertical-align: top;
@@ -41,7 +42,7 @@ li {
 }
 
 pre {
-  font-size: 12px;
+  font-size: .75rem;
 }
 
 code {
@@ -79,6 +80,24 @@ summary {
   width: 1.5rem;
   max-width: 1.5rem;
   height: auto;
+}
+
+.font-size {
+  font-size: .75rem;
+  position: absolute;
+  right: .5rem;
+}
+
+.smaller {
+  font-size: .75rem;
+}
+
+.bigger {
+  font-size: 1rem;
+}
+
+#font-size {
+  width: 4rem;
 }
 
 #container {
