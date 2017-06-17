@@ -83,8 +83,8 @@ const parseManifest = (manifest, baseUrl) => {
       members: [
         {key: 'share_target', name: 'Share Target'},
         {key: 'supports_share', name: 'Supports Share'},
-      ]
-    }
+      ],
+    },
   ];
 
   // Helper function to get absolute URLs
@@ -529,7 +529,7 @@ const renderHtml = (state, scope, relativeScriptUrl, result) => {
     let walker = document.createTreeWalker(code, NodeFilter.SHOW_TEXT,
         null, false);
     let node;
-    while(node = walker.nextNode()) {
+    while (node = walker.nextNode()) {
       if (new RegExp(`on${input.id}`).test(node.textContent.trim())) {
         const previousSibling = node.previousSibling;
         const nextSibling = node.nextSibling;
@@ -565,11 +565,20 @@ browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
       let importedScriptsPromises = [];
       let importedScriptsUrls = [];
       esprima.parse(result.source, {}, (node) => {
-        if ((node.type === 'CallExpression') &&
-            (node.callee.type === 'Identifier') &&
-            (node.callee.name === 'importScripts') &&
-            (node.arguments) &&
-            (Array.isArray(node.arguments))) {
+        if ((
+              (node.type === 'CallExpression') &&
+              (node.callee.type === 'Identifier') &&
+              (node.callee.name === 'importScripts') &&
+              (node.arguments) &&
+              (Array.isArray(node.arguments))
+            ) ||
+            (
+              (node.type === 'CallExpression') &&
+              (node.callee.type === 'MemberExpression') &&
+              (node.callee.object.type === 'Identifier') &&
+              (node.callee.object.name === 'self') &&
+              (node.callee.property.type === 'Identifier') &&
+              (node.callee.property.name === 'importScripts'))) {
           importedScriptsPromises = importedScriptsPromises.concat(
               node.arguments.map((arg) => {
             // This means ```importScripts(variable)``` rather than
@@ -586,7 +595,8 @@ browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
               }
               throw Error(`Couldn't load ${arg.value}`);
             })
-            .catch((e) => e);
+            // Fail gracefully if the linked script can't be loaded
+            .catch((e) => '');
           }));
         }
       });
