@@ -78,6 +78,13 @@ const parseManifest = (manifest, baseUrl) => {
         {key: 'gcm_user_visible_only', name: 'GCM User Visible Only'},
       ],
     },
+    {
+      name: 'Web Share',
+      members: [
+        {key: 'share_target', name: 'Share Target'},
+        {key: 'supports_share', name: 'Supports Share'},
+      ]
+    }
   ];
 
   // Helper function to get absolute URLs
@@ -192,6 +199,24 @@ const parseManifest = (manifest, baseUrl) => {
                 </tr>`);
           }
         });
+      } else if ((/^supports_share$/.test(keyId)) &&
+                 (typeof manifest[keyId] === 'boolean')) {
+        manifestHtml.push(`
+            <tr>
+              <td>${keyName}</td>
+              <td>${manifest[keyId] === true ? 'true' : 'false'}</td>
+            </tr>`);
+      } else if ((/^share_target$/.test(keyId)) &&
+                 (typeof manifest[keyId] === 'object')) {
+        manifestHtml.push(`
+            <tr>
+              <td>${keyName}</td>
+              <td>
+                <pre><code class="language-javascript">${
+                    beautify(JSON.stringify(manifest[keyId]))
+                }</code></pre>
+              </td>
+            </tr>`);
       } else if (manifest[keyId] !== undefined) {
         manifestHtml.push(`
             <tr>
