@@ -13,6 +13,8 @@ Note: this is not an official Google product.
 
 ![Screenshot Manifest](https://github.com/google/service-worker-detector/blob/master/assets/screenshot-manifest.png)
 
+![Screenshot Cache Storage](https://github.com/google/service-worker-detector/blob/master/assets/screenshot-cachestorage.png)
+
 ## 🔧 🛍 Installation
 Install the Service Worker Detector extension via the
 [Chrome Web Store](https://chrome.google.com/webstore/detail/service-worker-detector/ofdigdofloanabjcaijfidkogmejlmjc).
