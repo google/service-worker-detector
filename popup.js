@@ -559,11 +559,11 @@ browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
     const scopeUrl = new URL(result.scope);
     const relativeScopeUrl = `${scopeUrl.pathname}${scopeUrl.search}`;
     const state = result.state.charAt(0).toUpperCase() + result.state.slice(1);
+    // Find importScripts statements
+    let importedScriptsPromises = [];
+    let importedScriptsUrls = [];
     result.events = {};
     try {
-      // Find importScripts statements
-      let importedScriptsPromises = [];
-      let importedScriptsUrls = [];
       esprima.parse(result.source, {}, (node) => {
         if ((
               (node.type === 'CallExpression') &&
@@ -600,20 +600,27 @@ browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
           }));
         }
       });
-      Promise.all(importedScriptsPromises)
-      .then((importedScriptsSources) => {
-        let importedScripts = {};
-        importedScriptsSources.map((script, i) => {
-          importedScripts[importedScriptsUrls[i]] = importedScriptsSources[i];
-        });
-        result.importedScripts = importedScripts;
-        return result;
-      })
-      .then(() => {
-        // Some events may be hidden in imported scripts, so analyze them, too
-        const jointSources = Object.keys(result.importedScripts).map((url) => {
-          return result.importedScripts[url];
-        }).join('\n') + result.source;
+    } catch (parseError) {
+      result.source = JSON.stringify(parseError, null, 2);
+      return renderHtml(state, relativeScopeUrl, relativeScriptUrl, result);
+    }
+    Promise.all(importedScriptsPromises)
+    .then((importedScriptsSources) => {
+      let importedScripts = {};
+      importedScriptsSources.map((script, i) => {
+        // Make sure trailing source map comments don't cause issues
+        importedScripts[importedScriptsUrls[i]] =
+            `$importedScriptsSources[i]\n`;
+      });
+      result.importedScripts = importedScripts;
+      return result;
+    })
+    .then(() => {
+      // Some events may be hidden in imported scripts, so analyze them, too
+      const jointSources = Object.keys(result.importedScripts).map((url) => {
+        return result.importedScripts[url];
+      }).join('\n') + result.source;
+      try {
         esprima.parse(jointSources, {}, (node) => {
           // Find addEventlistener('$event') style events
           if ((node.type === 'CallExpression') &&
@@ -635,11 +642,11 @@ browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
             result.events[event] = true;
           }
         });
-        renderHtml(state, relativeScopeUrl, relativeScriptUrl, result);
-      });
-    } catch (parseError) {
-      result.source = JSON.stringify(parseError, null, 2);
-      renderHtml(state, relativeScopeUrl, relativeScriptUrl, result);
-    }
+      } catch (parseError) {
+        result.source = JSON.stringify(parseError, null, 2);
+        return renderHtml(state, relativeScopeUrl, relativeScriptUrl, result);
+      }
+      return renderHtml(state, relativeScopeUrl, relativeScriptUrl, result);
+    });
   });
 });
