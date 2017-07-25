@@ -245,12 +245,14 @@ const getServiceWorkerHtml =
     let regExpUrl = importedScriptUrl.replace(/[\\^$*+?.()|[\]{}]/g, '\\$&');
     // Deal with potentially escaped forward slashes
     regExpUrl = regExpUrl.replace(/\//g, '\\\\?/');
-    const regExp = new RegExp(`(["'])${regExpUrl}["']`, 'g');
+    /* eslint-disable max-len */
+    const regExp = new RegExp(`(importScripts[\\s\\S]*?\\([\\s\\S]*?)(["'])${regExpUrl}["']`, 'g');
+    /* eslint-enable max-len */
     const code = beautify(result.importedScripts[importedScriptUrl]);
     beautifiedCode = beautifiedCode.replace(regExp,
         /* eslint-disable max-len */
         // Can't have new lines here as the syntax highlighter chokes on them
-        `<details class="imported-script"><summary class="imported-script"><a href="${importedScriptUrl}">$1${importedScriptUrl}$1</a></summary><div>${code}</div></details>`);
+        `$1<details class="imported-script"><summary class="imported-script"><a href="${importedScriptUrl}">$2${importedScriptUrl}$2</a></summary><div>${code}</div></details>`);
         /* eslint-enable max-len */
   }
   return `
@@ -309,7 +311,7 @@ const getServiceWorkerHtml =
               </th>
             </tr>
             <tr>
-              <td colspan="3">
+              <td colspan="4">
                 <pre id="sw-code"><code class="language-javascript">${
                     beautifiedCode}</code></pre>
               </td>
@@ -610,7 +612,7 @@ browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
       importedScriptsSources.map((script, i) => {
         // Make sure trailing source map comments don't cause issues
         importedScripts[importedScriptsUrls[i]] =
-            `$importedScriptsSources[i]\n`;
+            `${importedScriptsSources[i]}\n`;
       });
       result.importedScripts = importedScripts;
       return result;
