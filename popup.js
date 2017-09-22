@@ -85,6 +85,21 @@ const parseManifest = (manifest, baseUrl) => {
         {key: 'supports_share', name: 'Supports Share'},
       ],
     },
+    {
+      name: 'Service Worker',
+      members: [
+        {
+          key: 'serviceworker',
+          name: 'Service Worker',
+          submembers: [
+            {key: 'src', name: 'Source'},
+            {key: 'scope', name: 'Scope'},
+            {key: 'type', name: 'Type'},
+            {key: 'use_cache', name: 'Use Cache'},
+          ],
+        },
+      ],
+    },
   ];
 
   // Helper function to get absolute URLs
@@ -122,6 +137,7 @@ const parseManifest = (manifest, baseUrl) => {
     cluster.members.forEach((key) => {
       const keyName = key.name;
       const keyId = key.key;
+      const submembers = key.submembers || null;
       if (/_color$/.test(keyId) && manifest[keyId]) {
         manifestHtml.push(`
             <tr>
@@ -180,6 +196,9 @@ const parseManifest = (manifest, baseUrl) => {
           }
           const url = absoluteUrl(relatedApplication.url);
           const id = relatedApplication.id || '';
+          const minVersion = relatedApplication.min_version || '';
+          const fingerprints = relatedApplication.fingerprints ?
+              relatedApplication.fingerprints.toString() : '';
           if (!url && !id) {
             return;
           }
@@ -189,6 +208,10 @@ const parseManifest = (manifest, baseUrl) => {
                   <td>${platform}</td>
                   <td>
                     <a href="${url}" title="${id}">${url}</a>
+                    ${minVersion ?
+                        `<div><small>${minVersion}</small></div>` : ''}
+                    ${fingerprints ?
+                        `<div><small>${fingerprints}</small></div>` : ''}
                   </td>
                 </tr>`);
           } else {
@@ -217,6 +240,31 @@ const parseManifest = (manifest, baseUrl) => {
                 }</code></pre>
               </td>
             </tr>`);
+      } else if ((/^serviceworker$/.test(keyId)) &&
+                 (typeof manifest[keyId] === 'object')) {
+        const serviceworker = manifest[keyId];
+        const values = {
+          src: serviceworker.src ?
+              `<a href="${absoluteUrl(serviceworker.src)}">
+                ${serviceworker.src}</a>` :
+              '',
+          scope: serviceworker.scope ?
+              `<a href="${absoluteUrl(serviceworker.scope)}">
+                ${serviceworker.scope}</a>` :
+              '',
+          type: serviceworker.type || '',
+          use_cache: typeof serviceworker.use_cache === 'boolean' ?
+              serviceworker.use_cache.toString() : '',
+        };
+        submembers.forEach((submember) => {
+          if (values[submember.key]) {
+            manifestHtml.push(`
+              <tr>
+                <td>${submember.name}</td>
+                <td>${values[submember.key]}</td>
+              </tr>`);
+          }
+        });
       } else if (manifest[keyId] !== undefined) {
         manifestHtml.push(`
             <tr>

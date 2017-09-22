@@ -18,9 +18,9 @@
   },
   "homepage": "https://github.com/google/service-worker-detector#readme",
   "devDependencies": {
-    "eslint": "^4.3.0",
+    "eslint": "^4.7.2",
     "eslint-config-google": "^0.9.1",
-    "stylelint-csstree-validator": "^1.1.1"
+    "stylelint-csstree-validator": "^1.2.0"
   },
   "eslintConfig": {
     "parserOptions": {
