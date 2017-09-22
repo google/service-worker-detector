@@ -16,8 +16,10 @@ Note: this is not an official Google product.
 ![Screenshot Cache Storage](https://github.com/google/service-worker-detector/blob/master/assets/screenshot-cachestorage.png)
 
 ## 🔧 🛍 Installation
-Install the Service Worker Detector extension via the
-[Chrome Web Store](https://chrome.google.com/webstore/detail/service-worker-detector/ofdigdofloanabjcaijfidkogmejlmjc).
+Install the Service Worker Detector extension for your favorite browser:
+  - [Google Chrome](https://chrome.google.com/webstore/detail/service-worker-detector/ofdigdofloanabjcaijfidkogmejlmjc?hl=en)
+  - [Opera](https://addons.opera.com/en/extensions/details/service-worker-detector/)
+  - [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/service-worker-detector/)
 
 ## ⚤ 👍 Diversity in Tech
 The extension represents Service Workers with
