@@ -47,6 +47,8 @@ const parseManifest = (manifest, baseUrl) => {
         {key: 'display', name: 'Display'},
         {key: 'lang', name: 'Language'},
         {key: 'dir', name: 'Direction'},
+        {key: 'iarc_rating_id', name: 'IARC Rating ID'},
+        {key: 'categories', name: 'Categories'},
       ],
     },
     {
@@ -179,6 +181,13 @@ const parseManifest = (manifest, baseUrl) => {
                   ${manifest[keyId]}
                 </a>
               </td>
+            </tr>`);
+      } else if (/^categories$/.test(keyId) && manifest[keyId] &&
+          Array.isArray(manifest[keyId])) {
+        manifestHtml.push(`
+            <tr>
+              <td>${keyName}</td>
+              <td>${manifest[keyId].join(', ')}</td>
             </tr>`);
       } else if ((/^prefer_related_applications$/.test(keyId)) &&
                  (typeof manifest[keyId] === 'boolean')) {
