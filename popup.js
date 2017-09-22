@@ -70,7 +70,14 @@ const parseManifest = (manifest, baseUrl) => {
           key: 'prefer_related_applications',
           name: 'Prefer Related Applications',
         },
-        {key: 'related_applications', name: 'Related Applications'},
+        {
+          key: 'related_applications',
+          name: 'Related Applications',
+          submembers: [
+            {key: 'min_version', name: 'Minimum Version'},
+            {key: 'fingerprints', name: 'Fingerprints'},
+          ],
+        },
       ],
     },
     {
@@ -205,22 +212,41 @@ const parseManifest = (manifest, baseUrl) => {
           }
           const url = absoluteUrl(relatedApplication.url);
           const id = relatedApplication.id || '';
-          const minVersion = relatedApplication.min_version || '';
-          const fingerprints = relatedApplication.fingerprints ?
-              relatedApplication.fingerprints.toString() : '';
           if (!url && !id) {
             return;
           }
+          const values = {
+            min_version: relatedApplication.min_version || '',
+            fingerprints: relatedApplication.fingerprints || '',
+          };
           if (url) {
             manifestHtml.push(`
                 <tr>
                   <td>${platform}</td>
                   <td>
                     <a href="${url}" title="${id}">${url}</a>
-                    ${minVersion ?
-                        `<div><small>${minVersion}</small></div>` : ''}
-                    ${fingerprints ?
-                        `<div><small>${fingerprints}</small></div>` : ''}
+                    ${
+                      submembers.map((submember) => {
+                        if (values[submember.key]) {
+                          return `
+                            <div>
+                              <small>
+                                <strong>${submember.name}:</strong>
+                                ${(submember.key === 'fingerprints') ?
+                                    values[submember.key].map((fingerprint) => {
+                                      return `
+                                          <div>
+                                            <code>${fingerprint.value}</code>
+                                            (${fingerprint.type})
+                                          </div>`;
+                                    }).join('') :
+                                    values[submember.key]
+                                }
+                              </small>
+                            </div>`;
+                        }
+                      }).join('')
+                    }
                   </td>
                 </tr>`);
           } else {
