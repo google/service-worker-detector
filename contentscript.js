@@ -158,7 +158,6 @@ window.browser = window.browser || window.chrome;
       }
     })
     .catch((fetchError) => {
-      throw fetchError;
       console.log(fetchError);
     });
 
