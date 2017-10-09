@@ -673,7 +673,9 @@ browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
             }
             const importedScriptsUrl = arg.value.replace(/\\\//g, '/');
             importedScriptsUrls.push(importedScriptsUrl);
-            return fetch(new URL(importedScriptsUrl, result.scriptUrl))
+            return fetch(new URL(importedScriptsUrl, result.scriptUrl), {
+              credentials: 'include',
+            })
             .then((response) => {
               if (response.ok) {
                 return response.text();

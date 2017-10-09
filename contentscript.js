@@ -87,7 +87,7 @@ window.browser = window.browser || window.chrome;
     })
     .then((link) => {
       if (link && link.href) {
-        return fetch(link.href);
+        return fetch(link.href, {credentials: 'include'});
       }
       return false;
     })
@@ -158,6 +158,7 @@ window.browser = window.browser || window.chrome;
       }
     })
     .catch((fetchError) => {
+      throw fetchError;
       console.log(fetchError);
     });
 
