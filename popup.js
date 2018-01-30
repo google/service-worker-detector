@@ -158,12 +158,12 @@ const parseManifest = (manifest, baseUrl) => {
         // Sort icons by increasing size
         manifest[keyId]
         .sort((a, b) => {
-          return parseInt(a.sizes.split(' ')[0].split('x')[0], 10) -
-              parseInt(b.sizes.split(' ')[0].split('x')[0], 10);
+          return parseInt(a.sizes.split(' ')[0].split(/x/i)[0], 10) -
+              parseInt(b.sizes.split(' ')[0].split(/x/i)[0], 10);
         })
         .forEach((icon) => {
           const src = absoluteUrl(icon.src);
-          const firstSize = icon.sizes.split(' ')[0].split('x');
+          const firstSize = icon.sizes.split(' ')[0].split(/x/i);
           const width = firstSize[0];
           const height = firstSize[1];
           const type = icon.type || '';
