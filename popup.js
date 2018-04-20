@@ -163,19 +163,39 @@ const parseManifest = (manifest, baseUrl) => {
         })
         .forEach((icon) => {
           const src = absoluteUrl(icon.src);
-          const firstSize = icon.sizes.split(' ')[0].split(/x/i);
-          const width = firstSize[0];
-          const height = firstSize[1];
+          let width;
+          let height;
+          const sizesNotSpecified = /any/.test(icon.sizes);
+          if (sizesNotSpecified) {
+            width = 64;
+            height = 'auto';
+          } else {
+            const firstSize = icon.sizes.split(' ')[0].split(/x/i);
+            width = firstSize[0];
+            height = firstSize[1] || '';
+          }
           const type = icon.type || '';
-          manifestHtml.push(`
-              <tr>
-                <td>${width}x${height}</td>
-                <td>
-                  <img style="width:${width}px;height:${height}px;"
-                      src="${src}"
-                      title="${type ? type + ' ' : ''}${width}x${height}">
-                </td>
-              </tr>`);
+          if (sizesNotSpecified) {
+            manifestHtml.push(`
+                <tr>
+                  <td>any</td>
+                  <td>
+                    <img style="width:${width}px;height:${height};"
+                        src="${src}"
+                        title="${type ? type + ' ' : ''}any">
+                  </td>
+                </tr>`);
+          } else {
+            manifestHtml.push(`
+                <tr>
+                  <td>${width}x${height}</td>
+                  <td>
+                    <img style="width:${width}px;height:${height}px;"
+                        src="${src}"
+                        title="${type ? type + ' ' : ''}${width}x${height}">
+                  </td>
+                </tr>`);
+          }
         });
       } else if ((/^scope$/.test(keyId) || /^start_url$/.test(keyId)) &&
                  (manifest[keyId])) {
