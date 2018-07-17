@@ -11,7 +11,12 @@
     "128": "assets/icon-female.png"
   },
   "page_action": {
-    "default_icon": "assets/icon.png",
+    "default_icon": {
+      "19": "assets/icon.png",
+      "38": "assets/icon.png",
+      "40": "assets/icon.png",
+      "160": "assets/icon.png"
+    },
     "default_popup": "popup.html",
     "default_title": "❌👷‍ No active Service Worker found."
   },
