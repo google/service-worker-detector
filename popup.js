@@ -16,6 +16,13 @@
 
 window.browser = window.browser || window.chrome;
 
+// Polyfill the <details> element for Edge
+if (!('open' in document.createElement('details'))) {
+  const script = document.createElement('script');
+  script.src = 'third_party/details-element-polyfill.js';
+  document.head.appendChild(script);
+}
+
 const beautify = (source) => {
   const beautified = js_beautify(source, {
     indent_size: 2,

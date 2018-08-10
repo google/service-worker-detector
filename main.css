@@ -50,6 +50,7 @@ code {
 }
 
 details {
+  cursor: default;
   margin-bottom: 1rem;
 }
 
