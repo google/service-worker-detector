@@ -4,7 +4,8 @@
   "short_name": "SW Detector",
   "description": "This extension detects if a website registers a Service Worker.",
   "author": "Thomas Steiner (tomac@google.com, @tomayac)",
-  "version": "2.3.15",
+  "version": "2.3.16",
+  "content_security_policy": "script-src 'self' 'sha256-DXqn4fZAsJsbXVJfQzuKahbEuXv7fAkH7dd8fSd2jA8='; object-src 'self'",
   "icons": {
     "16": "assets/icon-female.png",
     "48": "assets/icon-female.png",
@@ -35,5 +36,5 @@
       "scripts": ["background.js"],
       "persistent": false
   },
-   "minimum_chrome_version": "40"
+  "minimum_chrome_version": "40"
 }

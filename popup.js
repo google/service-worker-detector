@@ -143,7 +143,7 @@ const parseManifest = (manifest, baseUrl) => {
   };
 
   let lastSize;
-  let manifestHtml = [];
+  const manifestHtml = [];
   clusters.forEach((cluster) => {
     manifestHtml.push(`
         <tr>
@@ -164,26 +164,26 @@ const parseManifest = (manifest, baseUrl) => {
                  (manifest[keyId] && Array.isArray(manifest[keyId]))) {
         // Sort icons by increasing size
         manifest[keyId]
-        .sort((a, b) => {
-          return parseInt(a.sizes.split(' ')[0].split(/x/i)[0], 10) -
+            .sort((a, b) => {
+              return parseInt(a.sizes.split(' ')[0].split(/x/i)[0], 10) -
               parseInt(b.sizes.split(' ')[0].split(/x/i)[0], 10);
-        })
-        .forEach((icon) => {
-          const src = absoluteUrl(icon.src);
-          let width;
-          let height;
-          const sizesNotSpecified = /any/.test(icon.sizes);
-          if (sizesNotSpecified) {
-            width = 64;
-            height = 'auto';
-          } else {
-            const firstSize = icon.sizes.split(' ')[0].split(/x/i);
-            width = firstSize[0];
-            height = firstSize[1] || '';
-          }
-          const type = icon.type || '';
-          if (sizesNotSpecified) {
-            manifestHtml.push(`
+            })
+            .forEach((icon) => {
+              const src = absoluteUrl(icon.src);
+              let width;
+              let height;
+              const sizesNotSpecified = /any/.test(icon.sizes);
+              if (sizesNotSpecified) {
+                width = 64;
+                height = 'auto';
+              } else {
+                const firstSize = icon.sizes.split(' ')[0].split(/x/i);
+                width = firstSize[0];
+                height = firstSize[1] || '';
+              }
+              const type = icon.type || '';
+              if (sizesNotSpecified) {
+                manifestHtml.push(`
                 <tr>
                   <td>any</td>
                   <td>
@@ -192,8 +192,8 @@ const parseManifest = (manifest, baseUrl) => {
                         title="${type ? type + ' ' : ''}any">
                   </td>
                 </tr>`);
-          } else {
-            manifestHtml.push(`
+              } else {
+                manifestHtml.push(`
                 <tr>
                   <td>${width}x${height}</td>
                   <td>
@@ -202,8 +202,8 @@ const parseManifest = (manifest, baseUrl) => {
                         title="${type ? type + ' ' : ''}${width}x${height}">
                   </td>
                 </tr>`);
-          }
-        });
+              }
+            });
       } else if ((/^scope$/.test(keyId) || /^start_url$/.test(keyId)) &&
                  (manifest[keyId])) {
         manifest[keyId] = absoluteUrl(manifest[keyId]);
@@ -253,9 +253,9 @@ const parseManifest = (manifest, baseUrl) => {
                   <td>
                     <a href="${url}" title="${id}">${url}</a>
                     ${
-                      submembers.map((submember) => {
-                        if (values[submember.key]) {
-                          return `
+  submembers.map((submember) => {
+    if (values[submember.key]) {
+      return `
                             <div>
                               <small>
                                 <strong>${submember.name}:</strong>
@@ -268,12 +268,12 @@ const parseManifest = (manifest, baseUrl) => {
                                           </div>`;
                                     }).join('') :
                                     values[submember.key]
-                                }
+}
                               </small>
                             </div>`;
-                        }
-                      }).join('')
-                    }
+    }
+  }).join('')
+}
                   </td>
                 </tr>`);
           } else {
@@ -298,8 +298,8 @@ const parseManifest = (manifest, baseUrl) => {
               <td>${keyName}</td>
               <td>
                 <pre><code class="language-javascript">${
-                    beautify(JSON.stringify(manifest[keyId]))
-                }</code></pre>
+  beautify(JSON.stringify(manifest[keyId]))
+}</code></pre>
               </td>
             </tr>`);
       } else if ((/^serviceworker$/.test(keyId)) &&
@@ -345,27 +345,27 @@ const parseManifest = (manifest, baseUrl) => {
 
 const getServiceWorkerHtml =
     (state, relativeScopeUrl, relativeScriptUrl, result) => {
-  let beautifiedCode = beautify(result.source);
-  for (importedScriptUrl in result.importedScripts) {
-    if (!Object.prototype.hasOwnProperty.call(result.importedScripts,
-        importedScriptUrl)) {
-      continue;
-    }
-    // From https://github.com/benjamingr/RegExp.escape/blob/master/polyfill.js
-    let regExpUrl = importedScriptUrl.replace(/[\\^$*+?.()|[\]{}]/g, '\\$&');
-    // Deal with potentially escaped forward slashes
-    regExpUrl = regExpUrl.replace(/\//g, '\\\\?/');
-    /* eslint-disable max-len */
-    const regExp = new RegExp(`(importScripts[\\s\\S]*?\\([\\s\\S]*?)(["'])${regExpUrl}["']`, 'g');
-    /* eslint-enable max-len */
-    const code = beautify(result.importedScripts[importedScriptUrl]);
-    beautifiedCode = beautifiedCode.replace(regExp,
+      let beautifiedCode = beautify(result.source);
+      for (importedScriptUrl in result.importedScripts) {
+        if (!Object.prototype.hasOwnProperty.call(result.importedScripts,
+            importedScriptUrl)) {
+          continue;
+        }
+        // From https://github.com/benjamingr/RegExp.escape/blob/master/polyfill.js
+        let regExpUrl = importedScriptUrl.replace(/[\\^$*+?.()|[\]{}]/g, '\\$&');
+        // Deal with potentially escaped forward slashes
+        regExpUrl = regExpUrl.replace(/\//g, '\\\\?/');
+        /* eslint-disable max-len */
+        const regExp = new RegExp(`(importScripts[\\s\\S]*?\\([\\s\\S]*?)(["'])${regExpUrl}["']`, 'g');
+        /* eslint-enable max-len */
+        const code = beautify(result.importedScripts[importedScriptUrl]);
+        beautifiedCode = beautifiedCode.replace(regExp,
         /* eslint-disable max-len */
         // Can't have new lines here as the syntax highlighter chokes on them
-        `$1<details class="imported-script"><summary class="imported-script"><a href="${importedScriptUrl}">$2${importedScriptUrl}$2</a></summary><div>${code}</div></details>`);
+            `$1<details class="imported-script"><summary class="imported-script"><a href="${importedScriptUrl}">$2${importedScriptUrl}$2</a></summary><div>${code}</div></details>`);
         /* eslint-enable max-len */
-  }
-  return `
+      }
+      return `
       <details open>
         <summary>👷 Service Worker</summary>
         <table>
@@ -396,12 +396,12 @@ const getServiceWorkerHtml =
               <td>
                 <ul id="events">
                   ${result.events.sort().map((event) => {
-                    return `
+    return `
                         <li>
                           <input id="${event}" name="${event}" type="checkbox">
                           <label for="${event}">${event}</label>
                         </li>`;
-                  }).join('\n')}
+  }).join('\n')}
                 </ul>
               </td>
             </tr>
@@ -423,13 +423,13 @@ const getServiceWorkerHtml =
             <tr>
               <td colspan="4">
                 <pre id="sw-code"><code class="language-javascript">${
-                    beautifiedCode}</code></pre>
+  beautifiedCode}</code></pre>
               </td>
             </tr>
           </tbody>
         </table>
       </details>`;
-};
+    };
 
 const getManifestHtml = (result, baseUrl) => {
   return `
@@ -467,7 +467,7 @@ const getCacheHtml = ((cacheContents) => {
     'type',
   ];
   let first = true;
-  for (let cacheName in cacheContents) {
+  for (const cacheName in cacheContents) {
     if (!cacheContents.hasOwnProperty(cacheName)) {
       continue;
     }
@@ -479,40 +479,40 @@ const getCacheHtml = ((cacheContents) => {
           <table>
             <thead>
               <tr>${
-                columnNames.map((columnName) => {
-                  return `
+  columnNames.map((columnName) => {
+    return `
                       <th>${columnName === 'url' || columnName === 'mime' ?
                         columnName.toUpperCase() :
                         (columnName.charAt(0).toUpperCase() +
                         columnName.slice(1))}
                       </th>`;
-                }).join('\n')}
+  }).join('\n')}
               </tr>
             </thead>
             <tbody>${
-              cacheContents[cacheName].sort((a, b) => {
-                if (a.mime < b.mime) {
-                  return -1;
-                }
-                if (a.mime > b.mime) {
-                  return 1;
-                }
-                return 0;
-              })
-              .map((cacheEntry) => {
-                const url = cacheEntry.url;
-                const contentType = cacheEntry.mime;
-                return `
+  cacheContents[cacheName].sort((a, b) => {
+    if (a.mime < b.mime) {
+      return -1;
+    }
+    if (a.mime > b.mime) {
+      return 1;
+    }
+    return 0;
+  })
+      .map((cacheEntry) => {
+        const url = cacheEntry.url;
+        const contentType = cacheEntry.mime;
+        return `
                     <tr>
                       ${columnNames.map((columnName) => {
-                        if (columnName === 'url') {
-                          return `
+    if (columnName === 'url') {
+      return `
                               <td>
                                 <a href="${url}" title="${url}">${url}</a>
                               </td>`;
-                        } else if (columnName === 'mime') {
-                          if (/^image\//.test(contentType)) {
-                            return `
+    } else if (columnName === 'mime') {
+      if (/^image\//.test(contentType)) {
+        return `
                                 <td>
                                   <a href="${url}" title="${url}">
                                     <img class="preview" src="${url}"
@@ -520,63 +520,63 @@ const getCacheHtml = ((cacheContents) => {
                                         alt="${url}">
                                   </a>
                                 </td>`;
-                          } else if (/^text\/css$/.test(contentType)) {
-                            return `
+      } else if (/^text\/css$/.test(contentType)) {
+        return `
                                 <td>
                                   <span title="${contentType}">🖌</span>
                                 </td>`;
-                          } else if (/^audio\//.test(contentType)) {
-                            return `
+      } else if (/^audio\//.test(contentType)) {
+        return `
                                 <td>
                                   <span title="${contentType}">🔈</span>
                                 </td>`;
-                          } else if (/^video\//.test(contentType)) {
-                            return `
+      } else if (/^video\//.test(contentType)) {
+        return `
                                 <td>
                                   <span title="${contentType}">📹</span>
                                 </td>`;
-                          } else if (/\/.*?javascript/.test(contentType)) {
-                            return `
+      } else if (/\/.*?javascript/.test(contentType)) {
+        return `
                                 <td>
                                   <span title="${contentType}">📝</span>
                                 </td>`;
-                          } else if (/^text\/html/.test(contentType)) {
-                            return `
+      } else if (/^text\/html/.test(contentType)) {
+        return `
                                 <td>
                                   <span title="${contentType}">📄</span>
                                 </td>`;
-                          } else if (/^application\/.*?font/
-                              .test(contentType)) {
-                            return `
+      } else if (/^application\/.*?font/
+          .test(contentType)) {
+        return `
                                 <td>
                                   <span title="${contentType}">🔡</span>
                                 </td>`;
-                          } else if (/\/json/.test(contentType)) {
-                            return `
+      } else if (/\/json/.test(contentType)) {
+        return `
                                 <td>
                                   <span title="${contentType}">🔖</span>
                                 </td>`;
-                          } else if (/application\/manifest\+json/
-                              .test(contentType)) {
-                            return `
+      } else if (/application\/manifest\+json/
+          .test(contentType)) {
+        return `
                                 <td>
                                   <span title="${contentType}">📃</span>
                                 </td>`;
-                          } else {
-                            return `
+      } else {
+        return `
                                 <td>
                                   <span title="unknown">❓</span>
                                 </td>`;
-                          }
-                        } else {
-                          return `
+      }
+    } else {
+      return `
                               <td>
                                 ${cacheEntry[columnName]}
                               </td>`;
-                        }
-                      }).join('\n')}
+    }
+  }).join('\n')}
                     </tr>`;
-              }).join('\n')}
+      }).join('\n')}
             </tbody>
           </table>
         </details>`;
@@ -638,7 +638,7 @@ const renderHtml = (state, scope, relativeScriptUrl, result) => {
       }
     });
     // Find on$Event style events
-    let walker = document.createTreeWalker(code, NodeFilter.SHOW_TEXT,
+    const walker = document.createTreeWalker(code, NodeFilter.SHOW_TEXT,
         null, false);
     let node;
     while (node = walker.nextNode()) {
@@ -663,21 +663,21 @@ browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
   const currentTab = tabs[0];
   browser.tabs.sendMessage(currentTab.id, {type: 'getServiceWorker'},
       (result) => {
-    if (!result.scriptUrl || !result.state) {
-      return;
-    }
-    const scriptUrl = new URL(result.scriptUrl);
-    const relativeScriptUrl = `${scriptUrl.pathname}${scriptUrl.search}`;
-    const scopeUrl = new URL(result.scope);
-    const relativeScopeUrl = `${scopeUrl.pathname}${scopeUrl.search}`;
-    const state = result.state.charAt(0).toUpperCase() + result.state.slice(1);
-    // Find importScripts statements
-    let importedScriptsPromises = [];
-    let importedScriptsUrls = [];
-    result.events = {};
-    try {
-      esprima.parse(result.source, {}, (node) => {
-        if ((
+        if (!result.scriptUrl || !result.state) {
+          return;
+        }
+        const scriptUrl = new URL(result.scriptUrl);
+        const relativeScriptUrl = `${scriptUrl.pathname}${scriptUrl.search}`;
+        const scopeUrl = new URL(result.scope);
+        const relativeScopeUrl = `${scopeUrl.pathname}${scopeUrl.search}`;
+        const state = result.state.charAt(0).toUpperCase() + result.state.slice(1);
+        // Find importScripts statements
+        let importedScriptsPromises = [];
+        const importedScriptsUrls = [];
+        result.events = {};
+        try {
+          esprima.parse(result.source, {}, (node) => {
+            if ((
               (node.type === 'CallExpression') &&
               (node.callee.type === 'Identifier') &&
               (node.callee.name === 'importScripts') &&
@@ -691,76 +691,76 @@ browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
               (node.callee.object.name === 'self') &&
               (node.callee.property.type === 'Identifier') &&
               (node.callee.property.name === 'importScripts'))) {
-          importedScriptsPromises = importedScriptsPromises.concat(
-              node.arguments.map((arg) => {
-            // This means ```importScripts(variable)``` rather than
-            //  ```importScripts('https://example.org/sw.js')```
-            if (arg.type !== 'Literal') {
-              return Promise.resolve('');
+              importedScriptsPromises = importedScriptsPromises.concat(
+                  node.arguments.map((arg) => {
+                    // This means ```importScripts(variable)``` rather than
+                    //  ```importScripts('https://example.org/sw.js')```
+                    if (arg.type !== 'Literal') {
+                      return Promise.resolve('');
+                    }
+                    const importedScriptsUrl = arg.value.replace(/\\\//g, '/');
+                    importedScriptsUrls.push(importedScriptsUrl);
+                    return fetch(new URL(importedScriptsUrl, result.scriptUrl), {
+                      credentials: 'include',
+                    })
+                        .then((response) => {
+                          if (response.ok) {
+                            return response.text();
+                          }
+                          throw Error(`Couldn't load ${arg.value}`);
+                        })
+                    // Fail gracefully if the linked script can't be loaded
+                        .catch((e) => '');
+                  }));
             }
-            const importedScriptsUrl = arg.value.replace(/\\\//g, '/');
-            importedScriptsUrls.push(importedScriptsUrl);
-            return fetch(new URL(importedScriptsUrl, result.scriptUrl), {
-              credentials: 'include',
-            })
-            .then((response) => {
-              if (response.ok) {
-                return response.text();
-              }
-              throw Error(`Couldn't load ${arg.value}`);
-            })
-            // Fail gracefully if the linked script can't be loaded
-            .catch((e) => '');
-          }));
+          });
+        } catch (parseError) {
+          result.source = JSON.stringify(parseError, null, 2);
+          return renderHtml(state, relativeScopeUrl, relativeScriptUrl, result);
         }
-      });
-    } catch (parseError) {
-      result.source = JSON.stringify(parseError, null, 2);
-      return renderHtml(state, relativeScopeUrl, relativeScriptUrl, result);
-    }
-    Promise.all(importedScriptsPromises)
-    .then((importedScriptsSources) => {
-      let importedScripts = {};
-      importedScriptsSources.map((script, i) => {
-        // Make sure trailing source map comments don't cause issues
-        importedScripts[importedScriptsUrls[i]] =
+        Promise.all(importedScriptsPromises)
+            .then((importedScriptsSources) => {
+              const importedScripts = {};
+              importedScriptsSources.map((script, i) => {
+                // Make sure trailing source map comments don't cause issues
+                importedScripts[importedScriptsUrls[i]] =
             `${importedScriptsSources[i]}\n`;
-      });
-      result.importedScripts = importedScripts;
-      return result;
-    })
-    .then(() => {
-      // Some events may be hidden in imported scripts, so analyze them, too
-      const jointSources = Object.keys(result.importedScripts).map((url) => {
-        return result.importedScripts[url];
-      }).join('\n') + result.source;
-      try {
-        esprima.parse(jointSources, {}, (node) => {
-          // Find addEventlistener('$event') style events
-          if ((node.type === 'CallExpression') &&
+              });
+              result.importedScripts = importedScripts;
+              return result;
+            })
+            .then(() => {
+              // Some events may be hidden in imported scripts, so analyze them, too
+              const jointSources = Object.keys(result.importedScripts).map((url) => {
+                return result.importedScripts[url];
+              }).join('\n') + result.source;
+              try {
+                esprima.parse(jointSources, {}, (node) => {
+                  // Find addEventlistener('$event') style events
+                  if ((node.type === 'CallExpression') &&
               (node.callee.type === 'MemberExpression') &&
               (node.callee.property.name === 'addEventListener') &&
               (node.arguments) &&
               (Array.isArray(node.arguments)) &&
               (node.arguments.length) &&
               (node.arguments[0].type === 'Literal')) {
-            result.events[node.arguments[0].value] = true;
-          // Find on$Event style events
-          } else if ((node.type === 'ExpressionStatement') &&
+                    result.events[node.arguments[0].value] = true;
+                    // Find on$Event style events
+                  } else if ((node.type === 'ExpressionStatement') &&
                      (node.expression.type === 'AssignmentExpression') &&
                      (node.expression.left.type === 'MemberExpression') &&
                      (node.expression.left.object.name === 'self') &&
                      (node.expression.left.property.type === 'Identifier') &&
                      (/^on/.test(node.expression.left.property.name))) {
-            const event = node.expression.left.property.name.replace(/^on/, '');
-            result.events[event] = true;
-          }
-        });
-      } catch (parseError) {
-        result.source = JSON.stringify(parseError, null, 2);
-        return renderHtml(state, relativeScopeUrl, relativeScriptUrl, result);
-      }
-      return renderHtml(state, relativeScopeUrl, relativeScriptUrl, result);
-    });
-  });
+                    const event = node.expression.left.property.name.replace(/^on/, '');
+                    result.events[event] = true;
+                  }
+                });
+              } catch (parseError) {
+                result.source = JSON.stringify(parseError, null, 2);
+                return renderHtml(state, relativeScopeUrl, relativeScriptUrl, result);
+              }
+              return renderHtml(state, relativeScopeUrl, relativeScriptUrl, result);
+            });
+      });
 });
