@@ -26,7 +26,8 @@ Install the Service Worker Detector extension for your favorite browser:
   - [Google Chrome](https://chrome.google.com/webstore/detail/service-worker-detector/ofdigdofloanabjcaijfidkogmejlmjc?hl=en)
   - [Opera](https://addons.opera.com/en/extensions/details/service-worker-detector/)
   - [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/service-worker-detector/)
-  - [Microsoft Edge](https://www.microsoft.com/store/productid/9PGZBNL5BN9C)
+  - [Microsoft Edge (Chromium-based)](https://microsoftedge.microsoft.com/addons/detail/jcdnchdgholdalglebcklkbhlnhnlhon)
+  - [Microsoft Edge (EdgeHTML-based)](https://www.microsoft.com/store/productid/9PGZBNL5BN9C)
 
 ## ⚤ 👍 Diversity in Tech
 The extension represents Service Workers with
