@@ -26,7 +26,6 @@ window.browser = window.browser || window.chrome;
   const getServiceWorkerRegistration = () => {
     return new Promise((resolve) => {
       const script = document.createElement('script');
-      script.setAttribute('nonce', 'sha256-DXqn4fZAsJsbXVJfQzuKahbEuXv7fAkH7dd8fSd2jA8=');
       const id = 'bYLvrpRKtXHyEQJLCLNNDwg1v7StbX7HHfkgK+jb8Wo=';
       script.id = id;
       let observer = new MutationObserver((mutations) => {
