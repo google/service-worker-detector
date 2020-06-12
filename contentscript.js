@@ -149,18 +149,7 @@ window.browser = window.browser || window.chrome;
             })
             .then((cacheContents) => {
               result.cacheContents = cacheContents;
-              try {
-                return browser.runtime.sendMessage(null, result);
-              } catch (e) {
-                try {
-                  // ⚠️ TODO: Why does Firefox require ```option.toProxyScript```?
-                  return browser.runtime.sendMessage(null, result, {
-                    toProxyScript: false,
-                  });
-                } catch (e) {
-                  return browser.runtime.sendMessage(null, result);
-                }
-              }
+              return browser.runtime.sendMessage(null, result);
             })
             .catch((fetchError) => {
               console.log(fetchError);
