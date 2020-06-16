@@ -15,11 +15,11 @@ has a chance to become active.
 Note: this is not an official Google product.
 
 ## 🖥 🔫 Screenshots
-![Screenshot Service Worker](https://github.com/google/service-worker-detector/blob/master/assets/screenshot-serviceworker.png)
+![Screenshot Service Worker](https://github.com/google/service-worker-detector/blob/master/store-assets/screenshot-serviceworker.png)
 
-![Screenshot Manifest](https://github.com/google/service-worker-detector/blob/master/assets/screenshot-manifest.png)
+![Screenshot Manifest](https://github.com/google/service-worker-detector/blob/master/store-assets/screenshot-manifest.png)
 
-![Screenshot Cache Storage](https://github.com/google/service-worker-detector/blob/master/assets/screenshot-cachestorage.png)
+![Screenshot Cache Storage](https://github.com/google/service-worker-detector/blob/master/store-assets/screenshot-cachestorage.png)
 
 ## 🔧 🛍 Installation
 Install the Service Worker Detector extension for your favorite browser:
