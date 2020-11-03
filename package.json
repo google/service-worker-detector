@@ -1,11 +1,13 @@
 {
   "name": "service-worker-detector",
-  "version": "2.3.17",
+  "version": "2.4.0",
   "description": "This extension detects if a website registers a Service Worker.",
   "main": "background.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint . --fix && stylelint \"**/*.css\""
+    "copy": "shx rm -rf ./third_party && shx mkdir ./third_party && shx cp ./node_modules/js-beautify/js/lib/beautifier.min.js ./third_party/ && shx cp ./node_modules/prismjs/prism.js ./third_party/ && shx cp ./node_modules/prismjs/themes/prism.css ./third_party/ && shx cp ./node_modules/esprima/dist/esprima.js ./third_party/",
+    "fix": "npx prettier --write .",
+    "lint": "npx eslint . --fix && npx stylelint \"**/*.css\"",
+    "prepare": "npm run copy && npm run lint"
   },
   "repository": {
     "type": "git",
@@ -18,9 +20,14 @@
   },
   "homepage": "https://github.com/google/service-worker-detector#readme",
   "devDependencies": {
-    "eslint": "^7.3.1",
+    "eslint": "^7.12.1",
     "eslint-config-google": "^0.14.0",
-    "stylelint-csstree-validator": "^1.8.0"
+    "esprima": "^4.0.1",
+    "js-beautify": "^1.13.0",
+    "prettier": "^2.1.2",
+    "prismjs": "^1.22.0",
+    "shx": "^0.3.3",
+    "stylelint-csstree-validator": "^1.9.0"
   },
   "eslintConfig": {
     "parserOptions": {
@@ -45,6 +52,6 @@
     }
   },
   "dependencies": {
-    "stylelint": "^13.6.1"
+    "stylelint": "^13.7.2"
   }
 }

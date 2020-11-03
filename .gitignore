@@ -1,3 +1,4 @@
 node_modules/
+third_party/
 .DS_Store
 *.log

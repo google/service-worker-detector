@@ -16,8 +16,8 @@
 
 window.browser = window.browser || window.chrome;
 
-const beautify = (source) => {
-  const beautified = js_beautify(source, {
+const beautifyCode = (source) => {
+  const beautified = window.beautifier.js(source, {
     indent_size: 2,
     no_preserve_newlines: true,
     wrap_line_length: 80,
@@ -291,7 +291,7 @@ const parseManifest = (manifest, baseUrl) => {
               <td>${keyName}</td>
               <td>
                 <pre><code class="language-javascript">${
-  beautify(JSON.stringify(manifest[keyId]))
+  beautifyCode(JSON.stringify(manifest[keyId]))
 }</code></pre>
               </td>
             </tr>`);
@@ -338,7 +338,7 @@ const parseManifest = (manifest, baseUrl) => {
 
 const getServiceWorkerHtml =
     (state, relativeScopeUrl, relativeScriptUrl, result) => {
-      let beautifiedCode = beautify(result.source);
+      let beautifiedCode = beautifyCode(result.source);
       for (importedScriptUrl in result.importedScripts) {
         if (!Object.prototype.hasOwnProperty.call(result.importedScripts,
             importedScriptUrl)) {
@@ -351,7 +351,7 @@ const getServiceWorkerHtml =
         /* eslint-disable max-len */
         const regExp = new RegExp(`(importScripts[\\s\\S]*?\\([\\s\\S]*?)(["'])${regExpUrl}["']`, 'g');
         /* eslint-enable max-len */
-        const code = beautify(result.importedScripts[importedScriptUrl]);
+        const code = beautifyCode(result.importedScripts[importedScriptUrl]);
         beautifiedCode = beautifiedCode.replace(regExp,
         /* eslint-disable max-len */
         // Can't have new lines here as the syntax highlighter chokes on them
