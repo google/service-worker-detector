@@ -20,9 +20,7 @@
     "default_popup": "popup.html",
     "default_title": "❌👷‍ No active Service Worker found."
   },
-  "permissions": [
-    "activeTab"
-  ],
+  "permissions": ["activeTab"],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
@@ -32,8 +30,8 @@
     }
   ],
   "background": {
-      "scripts": ["background.js"],
-      "persistent": false
+    "scripts": ["background.js"],
+    "persistent": false
   },
   "minimum_chrome_version": "40"
 }

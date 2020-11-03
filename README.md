@@ -1,9 +1,10 @@
 # 👷‍♀️ 👷 Service Worker Detector
 
 ## 💻 💬 Description
+
 This extension detects if a website registers a
 [Service Worker](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorker)
-by reading the ```navigator.serviceWorker.controller```
+by reading the `navigator.serviceWorker.controller`
 [property](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerContainer/controller).
 This read-only property of the `ServiceWorkerContainer` interface only returns a `ServiceWorker`
 object if its state is `activated`. It returns `null` if the request is a force refresh
@@ -15,6 +16,7 @@ has a chance to become active.
 Note: this is not an official Google product.
 
 ## 🖥 🔫 Screenshots
+
 ![Screenshot Service Worker](https://github.com/google/service-worker-detector/blob/master/store_assets/screenshot-serviceworker.png)
 
 ![Screenshot Manifest](https://github.com/google/service-worker-detector/blob/master/store_assets/screenshot-manifest.png)
@@ -22,19 +24,23 @@ Note: this is not an official Google product.
 ![Screenshot Cache Storage](https://github.com/google/service-worker-detector/blob/master/store_assets/screenshot-cachestorage.png)
 
 ## 🔧 🛍 Installation
+
 Install the Service Worker Detector extension for your favorite browser:
-  - [Google Chrome](https://chrome.google.com/webstore/detail/service-worker-detector/ofdigdofloanabjcaijfidkogmejlmjc?hl=en)
-  - [Opera](https://addons.opera.com/en/extensions/details/service-worker-detector/)
-  - [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/service-worker-detector/)
-  - [Microsoft Edge (Chromium-based)](https://microsoftedge.microsoft.com/addons/detail/jcdnchdgholdalglebcklkbhlnhnlhon)
-  - [Microsoft Edge (EdgeHTML-based)](https://www.microsoft.com/store/productid/9PGZBNL5BN9C)
+
+- [Google Chrome](https://chrome.google.com/webstore/detail/service-worker-detector/ofdigdofloanabjcaijfidkogmejlmjc?hl=en)
+- [Opera](https://addons.opera.com/en/extensions/details/service-worker-detector/)
+- [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/service-worker-detector/)
+- [Microsoft Edge (Chromium-based)](https://microsoftedge.microsoft.com/addons/detail/jcdnchdgholdalglebcklkbhlnhnlhon)
+- [Microsoft Edge (EdgeHTML-based)](https://www.microsoft.com/store/productid/9PGZBNL5BN9C)
 
 ## ⚤ 👍 Diversity in Tech
+
 The extension represents Service Workers with
 [construction worker emoji](http://emojipedia.org/search/?q=construction+worker).
 The extension icon randomly features the female or the male construction worker.
 
 ## 📄 💼 License
+
 Copyright 2017 Google Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");

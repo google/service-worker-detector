@@ -17,7 +17,7 @@
 window.browser = window.browser || window.chrome;
 
 (() => {
-  if (!('serviceWorker' in navigator)) {
+  if (!("serviceWorker" in navigator)) {
     return;
   }
 
@@ -25,13 +25,15 @@ window.browser = window.browser || window.chrome;
   // injecting it directly instead
   const getServiceWorkerRegistration = () => {
     return new Promise((resolve) => {
-      const script = document.createElement('script');
-      const id = 'bYLvrpRKtXHyEQJLCLNNDwg1v7StbX7HHfkgK+jb8Wo=';
+      const script = document.createElement("script");
+      const id = "bYLvrpRKtXHyEQJLCLNNDwg1v7StbX7HHfkgK+jb8Wo=";
       script.id = id;
       let observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
-          if ((mutation.type === 'attributes') &&
-              (mutation.attributeName === 'data-scope')) {
+          if (
+            mutation.type === "attributes" &&
+            mutation.attributeName === "data-scope"
+          ) {
             const scope = script.dataset.scope;
             script.remove();
             observer.disconnect();
@@ -40,7 +42,7 @@ window.browser = window.browser || window.chrome;
           }
         });
       });
-      observer.observe(script, {attributes: true});
+      observer.observe(script, { attributes: true });
       script.textContent = `
           navigator.serviceWorker.ready
           .then(serviceWorkerRegistration => {
@@ -58,106 +60,103 @@ window.browser = window.browser || window.chrome;
   const result = {
     state: serviceWorkerController.state,
     scriptUrl: serviceWorkerController.scriptURL,
-    source: '',
-    manifest: '',
-    manifestUrl: '',
+    source: "",
+    manifest: "",
+    manifestUrl: "",
     cacheContents: {},
   };
-  getServiceWorkerRegistration()
-      .then((scope) => {
-        result.scope = scope;
-        const fetchOptions = {
-          credentials: 'include',
-          headers: {
-            // Required according to the spec:
-            // https://w3c.github.io/ServiceWorker/#service-worker-script-request
-            'service-worker': 'script',
-          },
-        };
-        fetch(result.scriptUrl, fetchOptions)
-            .then((response) => {
-              if (!response.ok) {
-                throw Error('Network response was not OK.');
-              }
-              return response.text();
-            })
-            .then((script) => {
-              result.source = script;
-              return document.querySelector('link[rel="manifest"]');
-            })
-            .then((link) => {
-              if (link && link.href) {
-                return fetch(link.href, {credentials: 'include'});
-              }
-              return false;
-            })
-            .then((response) => {
-              if (!response) {
-                return false;
-              }
-              if (!response.ok) {
-                throw Error('Network response was not OK.');
-              }
-              result.manifestUrl = response.url;
-              return response.json();
-            })
-            .then((manifest) => {
-              if (manifest) {
-                result.manifest = manifest;
-              }
-              if ('caches' in window) {
-                return caches.keys();
-              }
-              return [];
-            })
-            .then((cacheNames) => {
-              const cachePromises = [];
-              const cacheContents = {};
-              cacheNames.forEach((cacheName) => {
-                cacheContents[cacheName] = [];
-                cachePromises.push(
-                    caches.open(cacheName).then((cache) => cache.keys()));
-              });
-              return Promise.all(cachePromises)
-                  .then((cacheResults) => {
-                    const requestProperties = [
-                      'method',
-                      'url',
-                    ];
-                    const responsePromises = [];
-                    cacheResults.forEach((cacheResult, i) => {
-                      cacheResult.forEach((request) => {
-                        responsePromises.push(caches.match(request)
-                            .then((cacheResponse) => {
-                              const serializedRequest = {};
-                              requestProperties.forEach((requestProperty) => {
-                                serializedRequest[requestProperty] = request[requestProperty];
-                              });
-                              const contentType = cacheResponse.headers.get('content-type');
-                              serializedRequest.type = cacheResponse.type;
-                              serializedRequest.mime = contentType ?
-                  contentType.split(';')[0] :
-                  'unknown';
-                              return cacheContents[cacheNames[i]].push(serializedRequest);
-                            }));
-                      });
-                    });
-                    return Promise.all(responsePromises)
-                        .then(() => cacheContents);
-                  });
-            })
-            .then((cacheContents) => {
-              result.cacheContents = cacheContents;
-              return browser.runtime.sendMessage(null, result);
-            })
-            .catch((fetchError) => {
-              console.log(fetchError);
-            });
-
-        browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-          if (message.type === 'getServiceWorker') {
-            sendResponse(result);
-          }
+  getServiceWorkerRegistration().then((scope) => {
+    result.scope = scope;
+    const fetchOptions = {
+      credentials: "include",
+      headers: {
+        // Required according to the spec:
+        // https://w3c.github.io/ServiceWorker/#service-worker-script-request
+        "service-worker": "script",
+      },
+    };
+    fetch(result.scriptUrl, fetchOptions)
+      .then((response) => {
+        if (!response.ok) {
+          throw Error("Network response was not OK.");
+        }
+        return response.text();
+      })
+      .then((script) => {
+        result.source = script;
+        return document.querySelector('link[rel="manifest"]');
+      })
+      .then((link) => {
+        if (link && link.href) {
+          return fetch(link.href, { credentials: "include" });
+        }
+        return false;
+      })
+      .then((response) => {
+        if (!response) {
+          return false;
+        }
+        if (!response.ok) {
+          throw Error("Network response was not OK.");
+        }
+        result.manifestUrl = response.url;
+        return response.json();
+      })
+      .then((manifest) => {
+        if (manifest) {
+          result.manifest = manifest;
+        }
+        if ("caches" in window) {
+          return caches.keys();
+        }
+        return [];
+      })
+      .then((cacheNames) => {
+        const cachePromises = [];
+        const cacheContents = {};
+        cacheNames.forEach((cacheName) => {
+          cacheContents[cacheName] = [];
+          cachePromises.push(
+            caches.open(cacheName).then((cache) => cache.keys())
+          );
         });
+        return Promise.all(cachePromises).then((cacheResults) => {
+          const requestProperties = ["method", "url"];
+          const responsePromises = [];
+          cacheResults.forEach((cacheResult, i) => {
+            cacheResult.forEach((request) => {
+              responsePromises.push(
+                caches.match(request).then((cacheResponse) => {
+                  const serializedRequest = {};
+                  requestProperties.forEach((requestProperty) => {
+                    serializedRequest[requestProperty] =
+                      request[requestProperty];
+                  });
+                  const contentType = cacheResponse.headers.get("content-type");
+                  serializedRequest.type = cacheResponse.type;
+                  serializedRequest.mime = contentType
+                    ? contentType.split(";")[0]
+                    : "unknown";
+                  return cacheContents[cacheNames[i]].push(serializedRequest);
+                })
+              );
+            });
+          });
+          return Promise.all(responsePromises).then(() => cacheContents);
+        });
+      })
+      .then((cacheContents) => {
+        result.cacheContents = cacheContents;
+        return browser.runtime.sendMessage(null, result);
+      })
+      .catch((fetchError) => {
+        console.log(fetchError);
       });
+
+    browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      if (message.type === "getServiceWorker") {
+        sendResponse(result);
+      }
+    });
+  });
 })();

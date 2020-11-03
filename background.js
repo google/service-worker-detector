@@ -20,7 +20,7 @@ browser.runtime.onMessage.addListener((request, sender) => {
   if (request) {
     browser.pageAction.setIcon({
       tabId: sender.tab.id,
-      path: `assets/icon-${['male', 'female'][Math.round(Math.random())]}.png`,
+      path: `assets/icon-${["male", "female"][Math.round(Math.random())]}.png`,
     });
     browser.pageAction.setTitle({
       tabId: sender.tab.id,
@@ -34,7 +34,7 @@ browser.runtime.onMessage.addListener((request, sender) => {
     });
     browser.pageAction.setTitle({
       tabId: sender.tab.id,
-      title: '❌👷‍♀️ No active Service Worker found.',
+      title: "❌👷‍♀️ No active Service Worker found.",
     });
     browser.pageAction.hide(sender.tab.id);
   }
