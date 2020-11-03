@@ -11,9 +11,13 @@ body {
   width: 700px;
 }
 
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
 table {
   border: solid 2px #eee;
-  table-layout: fixed;
   margin-bottom: 0.25rem;
   width: 100%;
 }

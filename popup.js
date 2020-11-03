@@ -503,117 +503,119 @@ const getCacheHtml = (cacheContents) => {
           <summary class="cache-storage">Cache
             "<code>${cacheName}</code>"
           </summary>
-          <table>
-            <thead>
-              <tr>${columnNames
-                .map((columnName) => {
-                  return `
-                      <th>${
-                        columnName === "url" || columnName === "mime"
-                          ? columnName.toUpperCase()
-                          : columnName.charAt(0).toUpperCase() +
-                            columnName.slice(1)
-                      }
-                      </th>`;
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>${columnNames
+                  .map((columnName) => {
+                    return `
+                        <th>${
+                          columnName === "url" || columnName === "mime"
+                            ? columnName.toUpperCase()
+                            : columnName.charAt(0).toUpperCase() +
+                              columnName.slice(1)
+                        }
+                        </th>`;
+                  })
+                  .join("\n")}
+                </tr>
+              </thead>
+              <tbody>${cacheContents[cacheName]
+                .sort((a, b) => {
+                  if (a.mime < b.mime) {
+                    return -1;
+                  }
+                  if (a.mime > b.mime) {
+                    return 1;
+                  }
+                  return 0;
                 })
-                .join("\n")}
-              </tr>
-            </thead>
-            <tbody>${cacheContents[cacheName]
-              .sort((a, b) => {
-                if (a.mime < b.mime) {
-                  return -1;
-                }
-                if (a.mime > b.mime) {
-                  return 1;
-                }
-                return 0;
-              })
-              .map((cacheEntry) => {
-                const url = cacheEntry.url;
-                const contentType = cacheEntry.mime;
-                return `
-                    <tr>
-                      ${columnNames
-                        .map((columnName) => {
-                          if (columnName === "url") {
-                            return `
-                              <td>
-                                <a href="${url}" title="${url}">${url}</a>
-                              </td>`;
-                          } else if (columnName === "mime") {
-                            if (/^image\//.test(contentType)) {
+                .map((cacheEntry) => {
+                  const url = cacheEntry.url;
+                  const contentType = cacheEntry.mime;
+                  return `
+                      <tr>
+                        ${columnNames
+                          .map((columnName) => {
+                            if (columnName === "url") {
                               return `
                                 <td>
-                                  <a href="${url}" title="${url}">
-                                    <img class="preview" src="${url}"
-                                        title="${contentType}"
-                                        alt="${url}">
-                                  </a>
+                                  <a href="${url}" title="${url}">${url}</a>
                                 </td>`;
-                            } else if (/^text\/css$/.test(contentType)) {
-                              return `
-                                <td>
-                                  <span title="${contentType}">🖌</span>
-                                </td>`;
-                            } else if (/^audio\//.test(contentType)) {
-                              return `
-                                <td>
-                                  <span title="${contentType}">🔈</span>
-                                </td>`;
-                            } else if (/^video\//.test(contentType)) {
-                              return `
-                                <td>
-                                  <span title="${contentType}">📹</span>
-                                </td>`;
-                            } else if (/\/.*?javascript/.test(contentType)) {
-                              return `
-                                <td>
-                                  <span title="${contentType}">📝</span>
-                                </td>`;
-                            } else if (/^text\/html/.test(contentType)) {
-                              return `
-                                <td>
-                                  <span title="${contentType}">📄</span>
-                                </td>`;
-                            } else if (
-                              /^application\/.*?font/.test(contentType)
-                            ) {
-                              return `
-                                <td>
-                                  <span title="${contentType}">🔡</span>
-                                </td>`;
-                            } else if (/\/json/.test(contentType)) {
-                              return `
-                                <td>
-                                  <span title="${contentType}">🔖</span>
-                                </td>`;
-                            } else if (
-                              /application\/manifest\+json/.test(contentType)
-                            ) {
-                              return `
-                                <td>
-                                  <span title="${contentType}">📃</span>
-                                </td>`;
+                            } else if (columnName === "mime") {
+                              if (/^image\//.test(contentType)) {
+                                return `
+                                  <td>
+                                    <a href="${url}" title="${url}">
+                                      <img class="preview" src="${url}"
+                                          title="${contentType}"
+                                          alt="${url}">
+                                    </a>
+                                  </td>`;
+                              } else if (/^text\/css$/.test(contentType)) {
+                                return `
+                                  <td>
+                                    <span title="${contentType}">🖌</span>
+                                  </td>`;
+                              } else if (/^audio\//.test(contentType)) {
+                                return `
+                                  <td>
+                                    <span title="${contentType}">🔈</span>
+                                  </td>`;
+                              } else if (/^video\//.test(contentType)) {
+                                return `
+                                  <td>
+                                    <span title="${contentType}">📹</span>
+                                  </td>`;
+                              } else if (/\/.*?javascript/.test(contentType)) {
+                                return `
+                                  <td>
+                                    <span title="${contentType}">📝</span>
+                                  </td>`;
+                              } else if (/^text\/html/.test(contentType)) {
+                                return `
+                                  <td>
+                                    <span title="${contentType}">📄</span>
+                                  </td>`;
+                              } else if (
+                                /^application\/.*?font/.test(contentType)
+                              ) {
+                                return `
+                                  <td>
+                                    <span title="${contentType}">🔡</span>
+                                  </td>`;
+                              } else if (/\/json/.test(contentType)) {
+                                return `
+                                  <td>
+                                    <span title="${contentType}">🔖</span>
+                                  </td>`;
+                              } else if (
+                                /application\/manifest\+json/.test(contentType)
+                              ) {
+                                return `
+                                  <td>
+                                    <span title="${contentType}">📃</span>
+                                  </td>`;
+                              } else {
+                                return `
+                                  <td>
+                                    <span title="unknown">❓</span>
+                                  </td>`;
+                              }
                             } else {
                               return `
                                 <td>
-                                  <span title="unknown">❓</span>
+                                  ${cacheEntry[columnName]}
                                 </td>`;
                             }
-                          } else {
-                            return `
-                              <td>
-                                ${cacheEntry[columnName]}
-                              </td>`;
-                          }
-                        })
-                        .join("\n")}
-                    </tr>`;
-              })
-              .join("\n")}
-            </tbody>
-          </table>
+                          })
+                          .join("\n")}
+                      </tr>`;
+                })
+                .join("\n")}
+              </tbody>
+            </table>
+          </div>
         </details>`;
     first = false;
   }
