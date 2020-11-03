@@ -6,9 +6,10 @@
   "author": "Thomas Steiner (tomac@google.com, @tomayac)",
   "version": "2.4.0",
   "icons": {
-    "16": "assets/icon-female.png",
+    "16": "assets/icon-female-16.png",
     "48": "assets/icon-female.png",
-    "128": "assets/icon-female.png"
+    "128": "assets/icon-female-128.png",
+    "160": "assets/icon-female.png"
   },
   "page_action": {
     "default_icon": {

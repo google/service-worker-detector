@@ -7,7 +7,8 @@
     "copy": "shx rm -rf ./third_party && shx mkdir ./third_party && shx cp ./node_modules/js-beautify/js/lib/beautifier.min.js ./third_party/ && shx cp ./node_modules/prismjs/prism.js ./third_party/ && shx cp ./node_modules/prismjs/themes/prism.css ./third_party/ && shx cp ./node_modules/esprima/dist/esprima.js ./third_party/",
     "fix": "npx prettier --write .",
     "lint": "npx eslint . --fix && npx stylelint \"**/*.css\"",
-    "prepare": "npm run copy && npm run fix && npm run lint"
+    "prepare": "npm run copy && npm run fix && npm run lint",
+    "safari": "xcrun safari-web-extension-converter . --project-location ./safari/ --swift --force --bundle-identifier com.google.googlechromelabs.service-worker-detector"
   },
   "repository": {
     "type": "git",
