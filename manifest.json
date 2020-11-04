@@ -9,7 +9,9 @@
     "16": "assets/icon-female-16.png",
     "48": "assets/icon-female.png",
     "128": "assets/icon-female-128.png",
-    "160": "assets/icon-female.png"
+    "160": "assets/icon-female.png",
+    "512": "assets/icon-female-128.png",,
+    "1024": "assets/icon-female-128.png",
   },
   "page_action": {
     "default_icon": {

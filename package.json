@@ -8,7 +8,7 @@
     "fix": "npx prettier --write .",
     "lint": "npx eslint . --fix && npx stylelint \"**/*.css\"",
     "prepare": "npm run copy && npm run fix && npm run lint",
-    "safari": "xcrun safari-web-extension-converter . --project-location ./safari/ --swift --force --bundle-identifier com.google.googlechromelabs.service-worker-detector"
+    "safari": "xcrun safari-web-extension-converter . --project-location ../safari-extensions/service-worker-detector --copy-resources --swift --force --bundle-identifier com.google.googlechromelabs.service-worker-detector"
   },
   "repository": {
     "type": "git",

@@ -1,5 +1,4 @@
 node_modules/
 third_party/
-safari/
 .DS_Store
 *.log
