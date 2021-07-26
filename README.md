@@ -13,7 +13,7 @@ object if its state is `activated`. It returns `null` if the request is a force 
 ⚠️ If the extension does not seem to work, perform a soft reload, so the Service Worker
 has a chance to become active.
 
-Note: this is not an official Google product.
+This is not an officially supported Google product.
 
 ## 🖥 🔫 Screenshots
 
