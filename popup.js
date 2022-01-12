@@ -109,7 +109,7 @@ const parseManifest = (manifest, baseUrl) => {
 
   // Helper function to get absolute URLs
   const absoluteUrl = (urlString) => {
-    if (!urlString) {
+    if (urlString === false) {
       return false;
     }
     let url;
