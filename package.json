@@ -50,6 +50,6 @@
     }
   },
   "dependencies": {
-    "stylelint": "^13.7.2"
+    "stylelint": "^15.10.1"
   }
 }
