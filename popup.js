@@ -309,7 +309,7 @@ const parseManifest = (manifest, baseUrl) => {
               <td>${keyName}</td>
               <td>
                 <pre><code class="language-javascript">${beautifyCode(
-                  JSON.stringify(manifest[keyId])
+                  JSON.stringify(manifest[keyId]),
                 )}</code></pre>
               </td>
             </tr>`);
@@ -362,14 +362,14 @@ const getServiceWorkerHtml = (
   state,
   relativeScopeUrl,
   relativeScriptUrl,
-  result
+  result,
 ) => {
   let beautifiedCode = beautifyCode(result.source);
   for (importedScriptUrl in result.importedScripts) {
     if (
       !Object.prototype.hasOwnProperty.call(
         result.importedScripts,
-        importedScriptUrl
+        importedScriptUrl,
       )
     ) {
       continue;
@@ -381,7 +381,7 @@ const getServiceWorkerHtml = (
     /* eslint-disable max-len */
     const regExp = new RegExp(
       `(importScripts[\\s\\S]*?\\([\\s\\S]*?)(["'])${regExpUrl}["']`,
-      "g"
+      "g",
     );
     /* eslint-enable max-len */
     const code = beautifyCode(result.importedScripts[importedScriptUrl]);
@@ -389,7 +389,7 @@ const getServiceWorkerHtml = (
       regExp,
       /* eslint-disable max-len */
       // Can't have new lines here as the syntax highlighter chokes on them
-      `$1<details class="imported-script"><summary class="imported-script"><a href="${importedScriptUrl}">$2${importedScriptUrl}$2</a></summary><div>${code}</div></details>`
+      `$1<details class="imported-script"><summary class="imported-script"><a href="${importedScriptUrl}">$2${importedScriptUrl}$2</a></summary><div>${code}</div></details>`,
     );
     /* eslint-enable max-len */
   }
@@ -631,7 +631,7 @@ const renderHtml = (state, scope, relativeScriptUrl, result) => {
   if (result.manifest) {
     const baseUrl = result.manifestUrl.substring(
       0,
-      result.manifestUrl.lastIndexOf("/") + 1
+      result.manifestUrl.lastIndexOf("/") + 1,
     );
     html += getManifestHtml(result, baseUrl);
   }
@@ -664,7 +664,7 @@ const renderHtml = (state, scope, relativeScriptUrl, result) => {
     // Find addEventlistener('$event') style events
     const tokenStrings = code.querySelectorAll(
       "span.token.string",
-      "span.token.string.highlight"
+      "span.token.string.highlight",
     );
     tokenStrings.forEach((tokenString) => {
       if (
@@ -685,7 +685,7 @@ const renderHtml = (state, scope, relativeScriptUrl, result) => {
       code,
       NodeFilter.SHOW_TEXT,
       null,
-      false
+      false,
     );
     let node;
     while ((node = walker.nextNode())) {
@@ -762,7 +762,7 @@ browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
                     // Fail gracefully if the linked script can't be loaded
                     .catch((e) => "")
                 );
-              })
+              }),
             );
           }
         });
@@ -814,7 +814,7 @@ browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
               ) {
                 const event = node.expression.left.property.name.replace(
                   /^on/,
-                  ""
+                  "",
                 );
                 result.events[event] = true;
               }
@@ -825,11 +825,11 @@ browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
               state,
               relativeScopeUrl,
               relativeScriptUrl,
-              result
+              result,
             );
           }
           return renderHtml(state, relativeScopeUrl, relativeScriptUrl, result);
         });
-    }
+    },
   );
 });

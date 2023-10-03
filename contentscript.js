@@ -117,7 +117,7 @@ window.browser = window.browser || window.chrome;
         cacheNames.forEach((cacheName) => {
           cacheContents[cacheName] = [];
           cachePromises.push(
-            caches.open(cacheName).then((cache) => cache.keys())
+            caches.open(cacheName).then((cache) => cache.keys()),
           );
         });
         return Promise.all(cachePromises).then((cacheResults) => {
@@ -138,7 +138,7 @@ window.browser = window.browser || window.chrome;
                     ? contentType.split(";")[0]
                     : "unknown";
                   return cacheContents[cacheNames[i]].push(serializedRequest);
-                })
+                }),
               );
             });
           });
